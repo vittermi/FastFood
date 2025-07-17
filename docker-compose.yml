@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  mongo:
+    image: mongo:6
+    container_name: fastfood-mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb-data:/data/db
+
+  backend:
+    build:
+      context: ./fastfood-backend
+      dockerfile: Dockerfile
+    container_name: fastfood-backend
+    restart: no
+    ports:
+      - "5050:5050"
+    env_file:
+      - ./fastfood-backend/.env
+    depends_on:
+      - mongo
+    volumes:
+      - ./fastfood-backend:/app
+    working_dir: /app
+
+volumes:
+  mongodb-data:
