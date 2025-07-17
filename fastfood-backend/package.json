@@ -4,7 +4,8 @@
   "description": "FasFood application: the 2025-26 exam project for the 'Technologies and languages for the web' course at Università degli studi di Milano",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/server.js"
   },
   "author": "Vittorio Ermini (mat. 923130)",
   "license": "MIT",
