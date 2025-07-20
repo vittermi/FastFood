@@ -6,6 +6,14 @@ const restaurantSchema = new mongoose.Schema({
     address: String,
     phone: String,
     vat: String,
+    hours: [{
+        day: {
+            type: String,
+            enum: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
+        },
+        open: String,
+        close: String
+    }]
 });
 
 module.exports = mongoose.model('Restaurant', restaurantSchema);

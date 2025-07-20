@@ -1,0 +1,73 @@
+const Restaurant = require('../models/Restaurant');
+const User = require('../models/User');
+const UserTypes = require('../utils/enums');;
+
+exports.createRestaurant = async (req, res) => {
+    try {
+        const { name, address, phone, vat, hours } = req.body;
+        const owner = User.findById(req.user.id);
+
+        if (owner.userType != UserTypes.RESTAURATEUR) 
+            return res.status(403).json({ message: 'Only restaurateurs can create restaurants' });
+
+        const newRestaurant = new Restaurant({
+            owner,
+            name,
+            address,
+            phone,
+            vat, 
+            hours,
+        });
+
+        await newRestaurant.save();
+        res.status(201).json(newRestaurant);
+    } catch (err) {
+        console.error(`Error creating restaurant: ${err.message}`);
+        res.status(500).json({ message: err.message });
+    }
+}
+
+exports.getRestaurants = async (req, res) => {
+    try {
+        const restaurants = await Restaurant.find().populate('owner', 'username email');
+        res.json(restaurants);
+    } catch (err) {
+        console.error(`Error fetching restaurants: ${err.message}`);
+        res.status(500).json({ message: err.message });
+    }
+}
+
+exports.getRestaurantById = async (req, res) => {
+    try {
+        const restaurant = await Restaurant.findById(req.params.id).populate('owner', 'username email');
+        if (!restaurant) {
+            return res.status(404).json({ message: 'Restaurant not found' });
+        }
+        res.json(restaurant);
+    } catch (err) {
+        console.error(`Error fetching restaurant: ${err.message}`);
+        res.status(500).json({ message: err.message });
+    }
+}
+
+exports.updateRestaurant = async (req, res) => {
+    try {
+        const updatedRestaurant = await Restaurant.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        res.json({updatedRestaurant});
+    } catch (err) {
+        console.error(`Error updating restaurant: ${err.message}`);
+        res.status(500).json({ message: err.message });
+    }
+}
+
+exports.deleteRestaurant = async (req, res) => {
+    try {
+        await Restaurant.findByIdAndDelete(req.params.id);
+        res.json({ message: 'Restaurant deleted' });
+    } catch (err) {
+        console.error(`Error deleting restaurant: ${err.message}`);
+        res.status(500).json({ message: err.message });
+    }
+}
+
+
