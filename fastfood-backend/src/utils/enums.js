@@ -6,8 +6,10 @@ const UserTypes = Object.freeze({
 const OrderStatus = Object.freeze({
     ORDERED: 'Ordered',
     PREPARATION: 'In Preparation',
-    DELIVERY: 'In Delivery',
+    READY: 'Ready for pick up',
+    DELIVERY: 'In delivery',
     DELIVERED: 'Delivered',
+    CANCELLED: 'Cancelled',
 });
 
 module.exports = {

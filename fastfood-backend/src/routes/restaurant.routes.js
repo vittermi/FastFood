@@ -2,7 +2,9 @@ const express = require('express');
 const router = express.Router();
 const restaurantController = require('../controllers/restaurant.controller');
 const auth = require('../auth.middleware');
+const {body, validationResult } = require('express-validator');
 
+const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
 
 router.post(
     '/',
@@ -43,14 +45,15 @@ router.post(
     },
     restaurantController.createRestaurant
 );
+
 router.get('/', auth, restaurantController.getRestaurants);
+
 router.get('/:id', auth, restaurantController.getRestaurantById);
+
 router.put(
     '/:id',
     auth,
-    [
-        check('owner').isEmpty().withMessage('Owner cannot be changed'),
-    ],
+    body('owner').isEmpty().withMessage('Owner cannot be changed'),
     (req, res, next) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
@@ -58,4 +61,7 @@ router.put(
     },
     restaurantController.updateRestaurant
 );
+
 router.delete('/:id', auth, restaurantController.deleteRestaurant);
+
+module.exports = router;

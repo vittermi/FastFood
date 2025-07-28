@@ -5,6 +5,7 @@ const dishSchema = new mongoose.Schema({
     name: String,
     type: String,
     ingredients: [String],
+    measures: [String],
     allergens: [String],
     price: Number,
     photo: String,

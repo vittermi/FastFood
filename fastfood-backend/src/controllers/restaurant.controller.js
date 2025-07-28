@@ -1,11 +1,11 @@
 const Restaurant = require('../models/Restaurant');
 const User = require('../models/User');
-const UserTypes = require('../utils/enums');;
+const { UserTypes } = require('../utils/enums');;
 
 exports.createRestaurant = async (req, res) => {
     try {
         const { name, address, phone, vat, hours } = req.body;
-        const owner = User.findById(req.user.id);
+        const owner = await User.findById(req.user.id);
 
         if (owner.userType != UserTypes.RESTAURATEUR) 
             return res.status(403).json({ message: 'Only restaurateurs can create restaurants' });

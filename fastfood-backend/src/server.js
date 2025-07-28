@@ -3,9 +3,9 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const cors = require('cors');
 const helmet = require('helmet');
+const cookieParser = require('cookie-parser');
 
-const userRoutes = require('./routes/user.routes');
-const authRoutes = require('./routes/auth.routes');
+
 
 dotenv.config();
 const app = express();
@@ -13,9 +13,13 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 app.use(helmet());
+app.use(cookieParser());
 
-app.use('/api/users', userRoutes);
-app.use('/api/auth', authRoutes);
+app.use('/api/users', require('./routes/user.routes'));
+app.use('/api/auth', require('./routes/auth.routes'));
+app.use('/api/orders', require('./routes/order.routes'));
+app.use('/api/restaurants', require('./routes/restaurant.routes'));
+app.use('/api/dishes', require('./routes/dish.routes'));
 
 // TODO other apis
 const PORT = process.env.PORT || 5000;

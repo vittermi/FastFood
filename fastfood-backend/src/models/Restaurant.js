@@ -7,6 +7,7 @@ const restaurantSchema = new mongoose.Schema({
     phone: String,
     vat: String,
     hours: [{
+        _id: false,
         day: {
             type: String,
             enum: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
