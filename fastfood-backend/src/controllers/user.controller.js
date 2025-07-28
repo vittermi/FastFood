@@ -10,8 +10,15 @@ exports.register = async (req, res) => {
         await user.save();
         res.status(201).json({ message: 'User registered' });
     } catch (err) {
-        console.error(`Error processing register request: ${err}`);
-        res.status(500).json({ message: err.message });
+        console.error(`Error processing register request: ${err.message}`);
+
+        if (err.name === 'ValidationError')
+            return res.status(400).json({ message: 'Invalid input', details: err.errors });
+
+        if (err.code === 11000)
+            return res.status(409).json({ message: 'Duplicate field', field: Object.keys(err.keyPattern)[0] });
+
+        res.status(500).json({ message: 'Internal server error' });
     }
 };
 
@@ -20,8 +27,15 @@ exports.update = async (req, res) => {
         await User.findByIdAndUpdate(req.params.id, req.body);
         res.json({ message: 'User updated' });
     } catch (err) {
-        console.error(`Error processing update request: ${err}`);
-        res.status(400).json({ message: err.message });
+        console.error(`Error updating user: ${err.message}`);
+
+        if (err.name === 'ValidationError')
+            return res.status(400).json({ message: 'Invalid input', details: err.errors });
+
+        if (err.code === 11000)
+            return res.status(409).json({ message: 'Duplicate field', field: Object.keys(err.keyPattern)[0] });
+
+        res.status(500).json({ message: 'Internal server error' });
     }
 };
 
@@ -31,6 +45,10 @@ exports.remove = async (req, res) => {
         res.json({ message: 'User deleted' });
     } catch (err) {
         console.error(`Error processing remove request: ${err}`);
-        res.status(400).json({ message: err.message });
+
+        if (err.name === 'ValidationError')
+            return res.status(400).json({ message: 'Invalid input', details: err.errors });
+
+        res.status(500).json({ message: 'Internal server error' });
     }
 };
