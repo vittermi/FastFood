@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const restaurantController = require('../controllers/restaurant.controller');
+const dishController = require('../controllers/dish.controller');
 const auth = require('../auth.middleware');
 const {body, validationResult } = require('express-validator');
 
@@ -32,7 +33,7 @@ router.post(
             body('hours')
                 .custom((value) => {
                     const match = value.find(h => h.day === day);
-                    if (!match) return true; // it's fine if a day is omitted (closed)
+                    if (!match) return true; // se un giorno manca, il ristorante è chiuso
                     if (!match.open || !match.close) throw new Error(`${day} must have open and close`);
                     return true;
                 })
@@ -49,6 +50,8 @@ router.post(
 router.get('/', auth, restaurantController.getRestaurants);
 
 router.get('/:id', auth, restaurantController.getRestaurantById);
+
+router.get('/:restaurantId/dishes', dishController.getDishesForRestaurant);
 
 router.put(
     '/:id',
