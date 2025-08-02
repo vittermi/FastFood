@@ -9,6 +9,7 @@ services:
       - "27017:27017"
     volumes:
       - mongodb-data:/data/db
+    attach: false
 
   backend:
     build:
