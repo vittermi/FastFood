@@ -9,4 +9,6 @@ package-lock.json
 .env.test.local
 .env.production.local
 
+.vscode/
+
 .DS_Store   
