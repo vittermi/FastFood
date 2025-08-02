@@ -10,6 +10,11 @@ exports.createRestaurant = async (req, res) => {
         if (owner.userType != UserTypes.RESTAURATEUR)
             return res.status(403).json({ message: 'Only restaurateurs can create restaurants' });
 
+        const existingRestaurant = await Restaurant.findOne({ owner: owner._id });
+        if (existingRestaurant) 
+            return res.status(400).json({ message: 'Restaurant already exists for this owner' });
+        
+
         const newRestaurant = new Restaurant({
             owner,
             name,
