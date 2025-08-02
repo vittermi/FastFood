@@ -1,0 +1,45 @@
+@import url('https://fonts.googleapis.com/css2?family=Nata+Sans:wght@100..900&display=swap');
+
+body {
+    padding-top: 70px;
+    background-color: #f8f9fa;
+    overflow-x: hidden;
+    font-family: "Nata Sans", sans-serif;
+}
+
+.restaurant-card {
+    border: none;
+    border-radius: 0.5rem;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+.restaurant-card .img-fluid {
+    object-fit: cover;
+    max-height: 200px;
+}
+
+.sidebar {
+    background-color: #ffffff;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+}
+
+.filter-toggle {
+    display: none;
+}
+
+.filters-desktop {
+    display: block;
+}
+
+@media (max-width: 768px) {
+    .filter-toggle {
+        display: block;
+    }
+
+    #filters.mobile-hidden {
+        display: none;
+    }
+}
