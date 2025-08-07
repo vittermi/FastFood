@@ -2,10 +2,9 @@ const mongoose = require('mongoose');
 
 const dishTemplateSchema = new mongoose.Schema({
     name: { type: String, required: true },
-    ingredients: [String],
-    measures: [String],
+    ingredients: { type: [String], required: true },
     allergens: [String],
-    type: { type: String },
+    category: { type: String },
     tags: [String],
     photo: String
 });

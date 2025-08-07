@@ -28,18 +28,21 @@ app.use(
       defaultSrc: ["'self'"],
       scriptSrc: [
         "'self'",
-        "https://cdn.jsdelivr.net", 
+        "https://cdn.jsdelivr.net", // bootstrap
       ],
       styleSrc: [
         "'self'",
         "'unsafe-inline'", // non sicurissimo ma c'est la vie
-        "https://cdn.jsdelivr.net",
+        "https://cdn.jsdelivr.net", // bootstrap
+        "https://fonts.googleapis.com", // google fonts
       ],
       fontSrc: [
         "'self'",
-        "https://cdn.jsdelivr.net",
+        "https://fonts.googleapis.com", // google fonts
+        "https://fonts.gstatic.com", // google fonts
+        "https://cdn.jsdelivr.net", // bootstrap
       ],
-      imgSrc: ["'self'", "data:"],
+      imgSrc: ["*", "data:"], // para las imajes de meals.json y bootstrap
       connectSrc: ["'self'"],
       objectSrc: ["'none'"],
       upgradeInsecureRequests: [],
@@ -61,7 +64,7 @@ app.get('/menu/:id', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'menu.html'));
 });
 
-app.get('/owner/restaurants', (_req, res) => res.sendFile(path.join(__dirname, 'public', 'manage-restaurants.html')));
+app.get('/owner/restaurant', (_req, res) => res.sendFile(path.join(__dirname, 'public', 'manage-restaurant.html')));
 
 
 

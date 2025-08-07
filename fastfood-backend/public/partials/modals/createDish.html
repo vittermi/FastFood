@@ -1,15 +1,13 @@
 <div class="modal fade" id="createDishModal" tabindex="-1" aria-labelledby="createDishModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
-            <!-- Modal Header -->
+
             <div class="modal-header">
                 <h5 class="modal-title" id="createDishModalLabel">Create New Dish</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
-            <!-- Modal Body: Dish Form -->
             <div class="modal-body">
-                <!-- ====== Dish Creation Form ====== -->
                 <form id="createDishForm" autocomplete="off">
                     <div class="mb-3">
                         <label for="dishName" class="form-label">Dish Name</label>
@@ -20,7 +18,7 @@
                         <label for="dishCategory" class="form-label">Category</label>
                         <select class="form-select" id="dishCategory" name="category" required>
                             <option value="" disabled selected>Select category</option>
-                            <!-- Add dynamic options here -->
+                            <!-- todo add dynamic options -->
                             <option value="pizza">Pizza</option>
                             <option value="drinks">Drinks</option>
                             <option value="desserts">Desserts</option>
@@ -31,21 +29,40 @@
                         <input type="number" class="form-control" id="dishPrice" name="price" placeholder="0.00" min="0"
                             step="0.01" required />
                     </div>
+
                     <div class="mb-3">
-                        <label for="dishDescription" class="form-label">Description</label>
-                        <textarea class="form-control" id="dishDescription" name="description" rows="3"
-                            placeholder="Describe the dish (optional)"></textarea>
+                        <label for="ingredientsChipBox" class="form-label">Ingredients</label>
+                        <div class="border rounded p-2 d-flex flex-wrap gap-2 align-items-center" id="ingredientsChipBox">
+                            <input id="ingredientsChipInput" class="border-0 flex-grow-1" placeholder="Add ingredient…">
+                            <button type="button" class="btn btn-success btn-sm ms-2" id="ingredientsChipAdd">+</button>
+                        </div>
                     </div>
+
+                    <div class="mb-3">
+                        <label for="tagsChipBox" class="form-label">Tags</label>
+                        <div class="border rounded p-2 d-flex flex-wrap gap-2 align-items-center" id="tagsChipBox">
+                            <input id="tagsChipInput" class="border-0 flex-grow-1" placeholder="Add tag…">
+                            <button type="button" class="btn btn-success btn-sm ms-2" id="tagsChipAdd">+</button>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="allergensChipBox" class="form-label">Allergens</label>
+                        <div class="border rounded p-2 d-flex flex-wrap gap-2 align-items-center" id="allergensChipBox">
+                            <input id="allergensChipInput" class="border-0 flex-grow-1" placeholder="Add allergen…">
+                            <button type="button" class="btn btn-success btn-sm ms-2" id="allergensChipAdd">+</button>
+                        </div>
+                    </div>
+
                     <div class="mb-3">
                         <label for="dishImage" class="form-label">Image URL</label>
                         <input type="url" class="form-control" id="dishImage" name="imageUrl"
                             placeholder="https://example.com/dish.jpg" />
                     </div>
-                    <!-- You can add more fields (e.g., ingredients, tags) as needed -->
+
                 </form>
             </div>
 
-            <!-- Modal Footer: Action Buttons -->
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     Cancel
@@ -57,4 +74,3 @@
         </div>
     </div>
 </div>
-<!-- ====== /Create New Dish Modal ====== -->

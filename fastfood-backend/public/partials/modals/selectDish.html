@@ -1,0 +1,39 @@
+<div class="modal fade" id="selectDishModal" tabindex="-1" aria-labelledby="selectDishModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createDishModalLabel">Select a dish to add to the menu</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+
+                <form id="selectDishForm">
+                    <div class="mb-3">
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="Search dish by name..."
+                                autocomplete="off">
+                            <button class="btn btn-outline-secondary" type="button" id="clearModalDishSearch">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="modalCategoryFilter" class="form-label">Category</label>
+                        <select class="form-select" id="modalCategoryFilter">
+                            <option selected>All Categories</option>
+                            <option>Pizza</option>
+                            <option>Desserts</option>
+                            <option>Drinks</option>
+                        </select>
+                    </div>
+                </form>
+
+                <div class="overflow-auto d-flex flex-wrap justify-content-center" id="modalDishGrid"></div>
+                <button id="moreBtn" class="btn btn-outline-secondary w-100 mt-3">Load more</button>
+
+            </div>
+        </div>
+    </div>
+</div>
