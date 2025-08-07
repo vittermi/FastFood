@@ -43,3 +43,11 @@ docker compose up
 ```
 
 The APIs will be available at http://localhost:5050 by default, a Swagger describing the APIs will be available at the /api-docs endpoint once the application is started.
+
+To import the dish data, you have to run the following command
+
+```sh
+docker compose exec backend npm run import:dishes
+```
+
+which will check if in the mongodb instance running inside the container the DishTemplate collection exists, and if not imports meal.json

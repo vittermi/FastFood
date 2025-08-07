@@ -1,27 +1,31 @@
 {
-  "name": "fastfood-backend",
-  "version": "1.0.0",
-  "description": "FasFood application: the 2025-26 exam project for the 'Technologies and languages for the web' course at Università degli studi di Milano",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node src/server.js"
-  },
-  "author": "Vittorio Ermini (mat. 923130)",
-  "license": "MIT",
-  "type": "commonjs",
-  "dependencies": {
-    "bcryptjs": "^3.0.2",
-    "cookie-parser": "^1.4.7",
-    "cors": "^2.8.5",
-    "dotenv": "^17.2.0",
-    "express": "^5.1.0",
-    "express-validator": "^7.2.1",
-    "helmet": "^8.1.0",
-    "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.16.3"
-  },
-  "devDependencies": {
-    "nodemon": "^3.1.10"
-  }
+    "name": "fastfood-backend",
+    "version": "1.0.0",
+    "description": "FasFood application: the 2025-26 exam project for the 'Technologies and languages for the web' course at Università degli studi di Milano",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "import:dishes": "node scripts/importDishes.js",
+        "start": "node server.js"
+    },
+    "author": "Vittorio Ermini (mat. 923130)",
+    "license": "MIT",
+    "type": "commonjs",
+    "dependencies": {
+        "bcryptjs": "^3.0.2",
+        "cookie-parser": "^1.4.7",
+        "cors": "^2.8.5",
+        "dotenv": "^17.2.0",
+        "express": "^5.1.0",
+        "express-validator": "^7.2.1",
+        "helmet": "^8.1.0",
+        "jsonwebtoken": "^9.0.2",
+        "mongoose": "^8.16.3",
+        "path": "^0.12.7",
+        "swagger-ui-express": "^5.0.1",
+        "yamljs": "^0.3.0"
+    },
+    "devDependencies": {
+        "nodemon": "^3.1.10"
+    }
 }
