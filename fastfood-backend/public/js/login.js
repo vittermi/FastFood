@@ -1,4 +1,4 @@
-import { setAccessToken, decodeJWT } from './auth.js';
+import { setAccessToken, getDecodedJWT } from './auth.js';
 
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -52,9 +52,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             setAccessToken(accessToken);
 
-            const payload = decodeJWT(accessToken);
+            const payload = getDecodedJWT();
 
-            if (payload.userType === 'restaurateur') window.location.assign('/owner/restaurants');
+            if (payload.userType === 'restaurateur') window.location.assign('/owner/restaurant');
             else window.location.assign('/restaurants');
         } catch (err) {
             console.error(err);

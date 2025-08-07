@@ -42,7 +42,15 @@ export async function authFetch(url, options = {}) {
     return response;
 }
 
-export function decodeJWT(token) {
+export function getDecodedJWT() {
+
+    const token = getAccessToken();
+
+    if (!token) {
+        logoutAndRedirect();
+        throw new Error('Not authenticated, please log in.');
+    } 
+
     try {
         const payload = token.split('.')[1];
         const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
