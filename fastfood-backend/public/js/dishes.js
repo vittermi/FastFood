@@ -1,4 +1,5 @@
-import { authFetch, getDecodedJWT } from './auth.js';
+import { authFetch } from './auth.js';
+import { getRestaurantId } from './utils.js';
 
 let dishes = [];
 let filtered = [];
@@ -67,20 +68,6 @@ async function loadDishes(query = '') {
             ${err.message || 'Failed to load dishes'}
         </div>`;
     }
-}
-
-async function getRestaurantId() {
-    const payload = getDecodedJWT();
-    const userID = payload.id;
-
-    const restaurantResponse = await authFetch(`/api/restaurants/?owner=${userID}`);
-
-    if (!restaurantResponse.ok) throw new Error('Failed to fetch restaurant');
-
-    const restaurantData = await restaurantResponse.json();
-    if (!restaurantData.length) throw new Error('No restaurant found for this user');
-
-    return restaurantData[0]._id;
 }
 
 
