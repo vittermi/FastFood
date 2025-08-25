@@ -8,7 +8,8 @@ const orderItemSchema = new mongoose.Schema({
 });
 
 const orderSchema = new mongoose.Schema({
-    customer: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    restaurant: { type: mongoose.Schema.Types.ObjectId, ref: 'Restaurant', required: true },
+    customer: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     items: [orderItemSchema],
     totalAmount: { type: Number, required: true, min: 0 },
     status: { type: String, enum: Object.values(OrderStatus), default: 'Ordered' },
