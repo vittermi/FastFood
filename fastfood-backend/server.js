@@ -66,8 +66,7 @@ app.get('/menu/:id', (req, res) => {
 
 app.get('/owner/restaurant', (_req, res) => res.sendFile(path.join(__dirname, 'public', 'manage-restaurant.html')));
 
-
-
+app.get('/register', (_req, res) => res.sendFile(path.join(__dirname, 'public', 'register.html')));
 
 // api backend 
 
