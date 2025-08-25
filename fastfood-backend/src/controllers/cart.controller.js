@@ -48,7 +48,9 @@ exports.clearCart = async (req, res) => {
     }
 };
 
-exports.removeDishFromCart = async (req, res) => {
+
+// todo update
+exports.updateDishQuantity = async (req, res) => {
     try {
         const { dishId } = req.params;
         const cart = await Cart.findOne({ customer: req.user.id });
@@ -58,7 +60,7 @@ exports.removeDishFromCart = async (req, res) => {
         await cart.save();
         res.status(200).json(cart);
     } catch (err) {
-        console.error(`Error removing dish: ${err.message}`);
+        console.error(`Error updating cart: ${err.message}`);
         res.status(500).json({ message: 'Internal server error' });
     }
 };

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Fastfood - Menu</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="./css/main.css" rel="stylesheet" />
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="/">FastFood</a>
+            <button class="btn btn-outline-secondary ms-auto" id="menuButton">Menu</button>
+        </div>
+    </nav>
+
+    <main class="container my-4 pt-5">
+
+        <div class="row">
+            <div class="col-md-8" id="menu-list">
+                <h2 id="menuPageTitle" class="mb-3"></h2>
+
+                <div class="input-group mb-4">
+                    <input type="text" class="form-control" id="dishSearch" placeholder="Search dishes…" />
+                    <button class="btn btn-outline-secondary" type="button" id="clearSearch">Clear</button>
+                </div>
+
+            </div>
+
+            <!-- -------- RIGHT COLUMN : DESKTOP CART -------- -->
+            <aside class="col-md-4 d-none d-md-block">
+                <div class="card sticky-top" id="cart">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">Your Cart</h5>
+                    </div>
+
+                    <ul class="list-group list-group-flush" id="cartItems">
+                        <!-- Cart item template -->
+
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <span class="fw-semibold">{{dish.name}}</span>
+                                <div class="small text-muted">x<span class="quantity">1</span></div>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <button class="btn btn-sm btn-outline-secondary me-1 decrease">−</button>
+                                <button class="btn btn-sm btn-outline-secondary me-3 increase">+</button>
+                                <span class="fw-bold line-total">€0.00</span>
+                            </div>
+                        </li>
+
+                    </ul>
+
+                    <div class="card-footer">
+                        <div class="d-flex justify-content-between mb-3">
+                            <span class="fw-semibold">Total:</span>
+                            <span class="fw-bold" id="cartTotal">€0.00</span>
+                        </div>
+                        <button class="btn btn-primary w-100" id="checkoutBtn">Checkout</button>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <!-- ============ MOBILE “VIEW CART” BUTTON ============ -->
+    <button class="btn btn-primary w-100 py-3 d-md-none position-fixed bottom-0 start-0 rounded-0"
+        id="cart-button-mobile">
+        View Cart (<span id="mobileCartCount">0</span>)
+    </button>
+
+    <!-- ============ MOBILE CART MODAL ============ -->
+    <div class="modal fade" id="cart-modal" tabindex="-1" aria-labelledby="cartModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable">
+            <div class="modal-content" id="cart-modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cartModalLabel">Your Cart</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <ul class="list-group list-group-flush" id="cartItemsMobile">
+                </ul>
+
+                <div class="modal-footer flex-column">
+                    <div class="w-100 d-flex justify-content-between mb-2">
+                        <span class="fw-semibold">Total:</span>
+                        <span class="fw-bold" id="cartTotalMobile">€0.00</span>
+                    </div>
+                    <button class="btn btn-primary w-100 mb-2" id="checkoutBtnMobile">Checkout</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="../js/menu.js"></script>
+</body>
+
+</html>

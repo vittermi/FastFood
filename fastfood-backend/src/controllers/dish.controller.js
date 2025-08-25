@@ -4,15 +4,18 @@ const Restaurant = require('../models/Restaurant');
 
 
 exports.createDish = async (req, res) => {
+
+    const restaurant = await Restaurant.findOne({ owner: req.user.id }).select('_id').lean().exec();
+
     try {
         const {
-            baseDish, restaurant, name, type, ingredients, category,
-            allergens, price, isAvailable, photo
+            baseDish, name, type, ingredients, category,
+            allergens, price, tags, photo
         } = req.body;
 
         if (baseDish) {
-            const base = await DishTemplate.findById(baseDishId);
-            if (!base) return res.status(404).json({ message: `Base dish with id ${Dish.baseDishId}` });
+            const base = await DishTemplate.findById(baseDish);
+            if (!base) return res.status(404).json({ message: `Base dish with id ${Dish.baseDish}` });
         }
 
         const newDish = new Dish({
@@ -24,12 +27,13 @@ exports.createDish = async (req, res) => {
             category,
             allergens,
             price,
-            isAvailable, // se null default true
+            tags,
             photo,
-            restaurant
         });
 
         await newDish.save();
+
+        console.log(`Dish created: ${newDish}`);
         res.status(201).json(newDish);
     } catch (err) {
         console.error('Error creating dish:', err.message);
@@ -85,16 +89,19 @@ exports.getDishById = async (req, res) => {
             restaurant: dish.restaurant,
             baseDish: base._id || null,
             name: dish.name || base.name,
-            ingredients: dish.ingredients || base.ingredients,
-            measures: dish.measures || base.measures,
-            allergens: dish.allergens || base.allergens,
-            type: dish.type || base.type,
-            photo: dish.photo || base.photo,
+            ingredients: (Array.isArray(dish.ingredients) && dish.ingredients.length > 0) 
+                ? dish.ingredients : base.ingredients,
+            category: dish.category || base.category,
+            allergens: (Array.isArray(dish.allergens) && dish.allergens.length > 0) 
+                ? dish.allergens : base.allergens,
             price: dish.price,
-            isAvailable: dish.isAvailable
+            tags: (Array.isArray(dish.tags) && dish.tags.length > 0) 
+                ? dish.tags : base.tags,
+            photo: dish.photo || base.photo,
         };
 
         res.json(merged);
+        console.log(`Dish fetched: ${merged}`);
     } catch (err) {
         console.error(`Error fetching dish: ${err.message}`);
         res.status(500).json({ message: 'Internal server error' });
@@ -104,14 +111,12 @@ exports.getDishById = async (req, res) => {
 
 exports.getDishesForRestaurant = async (req, res) => {
     try {
-
         const { restaurantId } = req.params;
 
         const restaurant = await Restaurant.findById(restaurantId);
         if (!restaurant) 
             return res.status(404).json({ message: 'Restaurant not found' });
         
-
         const filters = {};
         if (req.query.type) filters.type = req.query.type;
         if (req.query.isAvailable) filters.isAvailable = req.query.isAvailable === 'true';
@@ -124,26 +129,27 @@ exports.getDishesForRestaurant = async (req, res) => {
 
         const dishes = await Dish.find(filters).populate('baseDish');
         const result = dishes.map(dish => {
-        const base = dish.baseDish || {};
+            const base = dish.baseDish || {};
 
-      return {
-        _id: dish._id,
-        restaurant: dish.restaurant,
-        baseDish: base._id || null,
-        name: dish.name || base.name,
-        ingredients: dish.ingredients || base.ingredients,
-        measures: dish.measures || base.measures,
-        allergens: dish.allergens || base.allergens,
-        type: dish.type || base.type,
-        photo: dish.photo || base.photo,
-        price: dish.price,
-        isAvailable: dish.isAvailable
-      };
-    });
+            return {
+                 _id: dish._id,
+                restaurant: dish.restaurant,
+                baseDish: base._id || null,
+                name: dish.name || base.name,
+                ingredients: (Array.isArray(dish.ingredients) && dish.ingredients.length > 0) 
+                    ? dish.ingredients : base.ingredients,
+                category: dish.category || base.category,
+                allergens: (Array.isArray(dish.allergens) && dish.allergens.length > 0) 
+                    ? dish.allergens : base.allergens,
+                price: dish.price,
+                tags: (Array.isArray(dish.tags) && dish.tags.length > 0) 
+                    ? dish.tags : base.tags,
+                photo: dish.photo || base.photo,
+            };
+        });
 
-    res.json(result);
+        res.json(result);
 
-        res.json(dishes);
     } catch (err) {
         console.error(`Error fetching dishes for restaurant}: ${err.message}`);
         res.status(500).json({ message: 'Server error' });
