@@ -13,3 +13,18 @@ export async function getRestaurantId() {
 
     return restaurantData[0]._id;
 }
+
+export function debounce(fn, ms) {
+    let timer;
+    return (...args) => {
+        clearTimeout(timer);
+        timer = setTimeout(() => fn.apply(null, args), ms);
+    };
+}
+
+export function setImage(id, src, alt = 'Restaurant Cover') {
+    const imageNode = document.getElementById(id);
+    if (!imageNode) return;
+    imageNode.alt = alt;
+    imageNode.src = src ? src : '../img/placeholder.jpg';
+}

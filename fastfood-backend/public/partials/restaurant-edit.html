@@ -1,0 +1,91 @@
+<!-- ======= Restaurant Profile Edit Partial (specular layout) ======= -->
+
+<!-- Hero editable -->
+<div class="position-relative w-100 mb-4" style="height: 270px;">
+    <!-- Editable Cover Image -->
+    <img id="restaurantCover" alt="Restaurant Cover" class="w-100 h-100 object-fit-cover img-desaturated"
+        style="min-height: 200px; max-height: 320px;">
+    <!-- Pencil overlay (affordance only) -->
+    <button type="button" class="btn btn-light btn-sm position-absolute top-0 end-0 m-2 edit-icon-overlay"
+        aria-label="Change cover image">
+        <i class="bi bi-pencil-fill" aria-hidden="true"></i>
+    </button>
+    <!-- Name overlay (now editable) -->
+    <div class="position-absolute bottom-0 start-0 p-4 bg-dark bg-opacity-50 rounded-end">
+        <input type="text" class="form-control-plaintext text-white fw-bold p-0 m-0 display-5" id="restaurantNameInput"
+            aria-label="Restaurant name">
+    </div>
+</div>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-7">
+            <div class="card shadow mb-4">
+                <div class="card-body">
+
+                    <!-- Owner (read-only) -->
+                    <div class="p-3 border rounded bg-light mb-4">
+                        <div class="row">
+                            <label for="restaurantOwnerUsername"
+                                class="col-5 col-md-4 fw-semibold mb-0">Username</label>
+                            <div class="col">
+                                <input type="text" class="form-control" id="restaurantOwnerUsername" disabled
+                                    aria-readonly="true">
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <label for="restaurantOwnerEmail" class="col-5 col-md-4 fw-semibold mb-0">Email</label>
+                            <div class="col">
+                                <input type="email" class="form-control" id="restaurantOwnerEmail" disabled
+                                    aria-readonly="true">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Restaurant details (editable) -->
+                    <div class="mb-4">
+                        <div class="row mb-2">
+                            <label for="restaurantAddress"
+                                class="col-5 col-md-3 offset-md-1 fw-semibold mb-0">Address</label>
+                            <div class="col">
+                                <input type="text" class="form-control" id="restaurantAddress"
+                                    autocomplete="street-address">
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <label for="restaurantPhone"
+                                class="col-5 col-md-3 offset-md-1 fw-semibold mb-0">Phone</label>
+                            <div class="col">
+                                <input type="tel" class="form-control" id="restaurantPhone""
+                                    inputmode=" tel" autocomplete="tel">
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <label for="restaurantVat" class="col-5 col-md-3 offset-md-1 fw-semibold mb-0">VAT</label>
+                            <div class="col">
+                                <input type="text" class="form-control" id="restaurantVat" autocomplete="off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Opening Hours tab (structure only) -->
+                    <dl>
+                        <dt class="col-12 col-md-11 offset-md-1 mt-3 mb-4 fw-bold">Opening Hours</dt>
+                        <div id="hoursList" class="d-flex flex-column align-items-center"></div>
+                    </dl>
+
+
+
+
+
+
+                    <div class="mt-4 d-grid gap-2 d-md-flex justify-content-md-end">
+                        <button id="btnSaveProfile" class="btn btn-primary">Save Changes</button>
+                        <button id="btnCancelEdit" class="btn btn-outline-secondary">Cancel</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

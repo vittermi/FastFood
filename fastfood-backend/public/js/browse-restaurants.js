@@ -1,4 +1,5 @@
 import { authFetch } from './auth.js';  
+import { debounce } from './utils.js';
 
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -76,14 +77,5 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
             </div>
         </div>`;
-    }
-
-    // limita call alla API durante la ricerca
-    function debounce(fn, ms) {
-        let timer;
-        return (...args) => {
-            clearTimeout(timer);
-            timer = setTimeout(() => fn.apply(null, args), ms);
-        };
     }
 });

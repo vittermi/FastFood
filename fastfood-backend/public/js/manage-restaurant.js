@@ -7,22 +7,23 @@ const logoutBtn = document.getElementById('logoutBtn');
 
 document.addEventListener('DOMContentLoaded', () => {
     const nowActive = document.querySelector('nav .nav-link.active');
-    loadSection(nowActive ? nowActive.id.split('nav-')[1] : 'restaurant');
+    loadSection(nowActive ? nowActive.dataset.view : 'restaurant');
 });
 
 navLinks.forEach(link => {
-    const sectionId = link.id.split('nav-')[1];
 
     link.addEventListener('click', e => {
         e.preventDefault();
         setActive(link);
-        loadSection(sectionId);
+
+        // todo aggiungi check ristorante esistente per user e load edit.
+        loadSection(link.dataset.view);
     });
 });
 
-async function loadSection(sectionId) {
 
-    console.log('loadsection called');
+
+async function loadSection(sectionId, props = {}) {
 
     mainEl.innerHTML = spinner();
     try {
@@ -32,8 +33,8 @@ async function loadSection(sectionId) {
         mainEl.innerHTML = html;
 
         const module = await import(`/js/${sectionId}.js`);
-        
-        if (module.init) await module.init();
+
+        if (module.init) await module.init(props);
         else console.warn(`No init function found in ${sectionId}.js`);
         
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -42,6 +43,8 @@ async function loadSection(sectionId) {
         console.error(err);
     }
 }
+
+window.loadSection = loadSection;
 
 function setActive(activeLink) {
     navLinks.forEach(l => l.classList.toggle('active', l === activeLink));

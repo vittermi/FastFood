@@ -6,7 +6,7 @@ let dishes = [];
 let filtered = [];
 
 
-async function init() {
+export async function init() {
     const searchInput = document.getElementById('dishSearch');
     const clearBtn = document.getElementById('clearDishSearch');
 
@@ -26,8 +26,6 @@ async function init() {
         renderDishCards();
     });
 
-    //add renderDishCards after modal ok
-
     await initModals();
 }
 
@@ -41,7 +39,7 @@ async function loadDishes(query = '') {
             : `/api/restaurants/${restaurantId}/dishes`;
         const res = await authFetch(url);
         dishes = await res.json();
-        filtered = dishes;      // server already filtered when q present
+        filtered = dishes;
     } catch (err) {
         console.error(err);
         document.getElementById('dish-cards-list').innerHTML =
@@ -69,7 +67,7 @@ function createDishCard(dish) {
     col.className = 'col-12 col-sm-6 col-md-4 col-lg-3 mb-4';
     col.innerHTML = `
     <div class="card h-100 shadow-sm">
-      <img src="${dish.imageUrl || '/img/placeholder.jpg'}" class="card-img-top object-fit-cover" alt="${dish.name}">
+      <img src="${dish.photo || '/img/placeholder.jpg'}" class="card-img-top object-fit-cover" alt="${dish.name}">
       <div class="card-body d-flex flex-column">
         <h5 class="card-title mb-1">${dish.name}</h5>
         <p class="card-text text-muted small mb-2">${dish.category}</p>
@@ -96,14 +94,16 @@ async function initModals() {
     ]);
 
     await Promise.all([
-        createModal.ensureLoaded(),  
-        selectModal.ensureLoaded()   
+        createModal.ensureLoaded(),
+        selectModal.ensureLoaded()
     ]);
 
     selectBtn.addEventListener('click', async () => {
         try {
             const template = await selectModal.open();
             const dishData = await createModal.open({ prefill: template });
+
+            await createDish(dishData, template);
             await loadDishes();
             renderDishCards();
         } catch (e) {
@@ -114,6 +114,7 @@ async function initModals() {
     createBtn.addEventListener('click', async () => {
         try {
             const dishData = await createModal.open({});
+            await createDish(dishData);
             await loadDishes();
             renderDishCards();
         } catch (e) {
@@ -123,31 +124,24 @@ async function initModals() {
 }
 
 
-async function createDish(dishData) {
-    event.preventDefault();
-    const data = Object.fromEntries(new FormData(form));
-    if (data.price) data.price = parseFloat(data.price);
+async function createDish(dishData, selectedDishTemplate = {}) {
+    if (dishData.price) dishData.price = parseFloat(dishData.price);
 
     ['ingredients', 'tags', 'allergens'].forEach(type => {
-        const chips = [
-            ...document.querySelectorAll(`#${type}ChipBox .chip`)
-        ].map(chip => chip.dataset.value)
-            .filter(val => !selectedDishTemplate[type].includes(val));
-        data[type] = chips;
+            const submittedItems = Array.isArray(dishData[type]) ? dishData[type] : [];
+            const itemsInTemplateDish = Array.isArray(selectedDishTemplate[type]) ? selectedDishTemplate[type] : [];
+            dishData[type] = submittedItems.filter(item => !itemsInTemplateDish.includes(item));
     });
 
+    dishData.baseDish = selectedDishTemplate?._id || null;
+
     try {
-        await authFetch(`/api/restaurants/${restId}/dishes`, {
+        await authFetch(`/api/dishes`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data),
+            body: JSON.stringify(dishData),
         });
-        bsModal.hide();
-        await loadDishes();
-        renderDishCards();
     } catch (err) {
         alert(err.message || 'Failed to create dish');
     }
 }
-
-export { init }
