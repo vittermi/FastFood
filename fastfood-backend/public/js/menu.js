@@ -1,6 +1,7 @@
 import { authFetch } from './auth.js';
 import { debounce } from './utils.js';
 
+
 class RestaurantMenu {
     constructor() {
         this.API = {
@@ -135,18 +136,24 @@ class RestaurantMenu {
         card.innerHTML = `
           <div class="card-body">
             <div class="d-flex justify-content-between">
-              <div>
+                <div>
                 <h5 class="card-title mb-1">${dish.name}</h5>
                 <p class="card-text text-muted small mb-2">${dish.description || ''}</p>
                 <span class="fw-bold">${dish.price.toFixed(2)} €</span>
-              </div>
-              <div class="ms-3 d-flex align-items-center">
-                <button class="btn btn-sm btn-primary add-to-cart" data-id="${dish._id}">Add to Cart</button>
-              </div>
+                </div>
+                <div class="ms-3 d-flex align-items-center gap-2">
+                <button class="btn btn-sm btn-outline-secondary dish-details" data-id="${dish._id}">
+                    Details
+                </button>
+                <button class="btn btn-sm btn-primary add-to-cart" data-id="${dish._id}">
+                    Add to Cart
+                </button>
+                </div>
             </div>
-          </div>`;
+        </div>`;
 
         card.querySelector('.add-to-cart').addEventListener('click', () => this.addToCart(dish));
+        card.querySelector('.dish-details').addEventListener('click', () => this.showDishDetails(dish));
         return card;
     }
 
@@ -161,6 +168,16 @@ class RestaurantMenu {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ dishId: dish._id, quantity: 1 })
         }).catch(console.error);
+    }
+
+    async showDishDetails(dish) {
+        try {
+            const { openDishDetailsModal } = await import('/js/modals/dish-details-modal.js');
+            await openDishDetailsModal(dish);
+        } catch (error) {
+            console.error('Error showing dish details:', error);
+            alert('Unable to show dish details');
+        }
     }
 
     changeQty(dishId, delta) {
