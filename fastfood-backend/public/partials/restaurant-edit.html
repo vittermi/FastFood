@@ -19,9 +19,10 @@
 
 <div class="container">
     <div class="row justify-content-center">
-        <div class="col-12 col-md-7">
+        <div class="col-12 col-lg-7">
             <div class="card shadow mb-4">
                 <div class="card-body">
+                    <div id="editRestAlert" class="alert alert-danger d-none" role="alert"></div>
 
                     <!-- Owner (read-only) -->
                     <div class="p-3 border rounded bg-light mb-4">
@@ -73,11 +74,6 @@
                         <dt class="col-12 col-md-11 offset-md-1 mt-3 mb-4 fw-bold">Opening Hours</dt>
                         <div id="hoursList" class="d-flex flex-column align-items-center"></div>
                     </dl>
-
-
-
-
-
 
                     <div class="mt-4 d-grid gap-2 d-md-flex justify-content-md-end">
                         <button id="btnSaveProfile" class="btn btn-primary">Save Changes</button>

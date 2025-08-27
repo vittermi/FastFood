@@ -1,4 +1,5 @@
 import { authFetch } from './auth.js';
+import { showAlert, hideAlert } from './utils.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     const form = document.getElementById('registerForm');
@@ -53,18 +54,6 @@ function populateUserTypes(selectEl, types) {
     }
 }
 
-function showAlert(node, msg) {
-    if (!node) return;
-    node.textContent = msg;
-    node.classList.remove('d-none');
-}
-
-function hideAlert(node) {
-    if (!node) return;
-    node.textContent = '';
-    node.classList.add('d-none');
-}
-
 // todo ritorna da api
 async function getAvailableUserTypes() {
     return [
@@ -74,8 +63,6 @@ async function getAvailableUserTypes() {
 }
 
 async function registerUser(payload) {
-
-    debugger;
 
     const response = await authFetch('/api/users', {
         method: 'POST',

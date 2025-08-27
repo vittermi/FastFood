@@ -7,9 +7,7 @@ const {body, validationResult } = require('express-validator');
 
 const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
 
-router.post(
-    '/',
-    auth,
+const bodyValidatorArray = 
     [
         body('name')
             .trim()
@@ -38,7 +36,12 @@ router.post(
                     return true;
                 })
         )
-    ],
+    ];
+
+router.post(
+    '/',
+    auth,
+    bodyValidatorArray,
     (req, res, next) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
@@ -56,7 +59,7 @@ router.get('/:restaurantId/dishes', dishController.getDishesForRestaurant);
 router.put(
     '/:id',
     auth,
-    body('owner').isEmpty().withMessage('Owner cannot be changed'),
+    bodyValidatorArray,
     (req, res, next) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });

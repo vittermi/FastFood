@@ -28,3 +28,15 @@ export function setImage(id, src, alt = 'Restaurant Cover') {
     imageNode.alt = alt;
     imageNode.src = src ? src : '../img/placeholder.jpg';
 }
+
+export function showAlert(node, msg) {
+    if (!node) return;
+    node.textContent = msg;
+    node.classList.remove('d-none');
+}
+
+export function hideAlert(node) {
+    if (!node) return;
+    node.textContent = '';
+    node.classList.add('d-none');
+}

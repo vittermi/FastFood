@@ -53,20 +53,22 @@ app.use(
 
 // api frontend
 
+const pagePath = path.join(__dirname, 'public', 'pages');
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/', (_req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
-app.get('/login', (_req, res) => res.sendFile(path.join(__dirname, 'public', 'login.html')));
-app.get('/restaurants', (_req, res) => res.sendFile(path.join(__dirname, 'public', 'browse-restaurants.html')));
+app.get('/login', (_req, res) => res.sendFile(path.join(pagePath, 'login.html')));
+app.get('/restaurants', (_req, res) => res.sendFile(path.join(pagePath, 'browse-restaurants.html')));
 
 app.get('/menu/:id', (req, res) => {
     const restaurantId = req.params.id;
-    res.sendFile(path.join(__dirname, 'public', 'menu.html'));
+    res.sendFile(path.join(pagePath, 'menu.html'));
 });
 
-app.get('/owner/restaurant', (_req, res) => res.sendFile(path.join(__dirname, 'public', 'manage-restaurant.html')));
+app.get('/owner/restaurant', (_req, res) => res.sendFile(path.join(pagePath, 'manage-restaurant.html')));
 
-app.get('/register', (_req, res) => res.sendFile(path.join(__dirname, 'public', 'register.html')));
+app.get('/register', (_req, res) => res.sendFile(path.join(pagePath, 'register.html')));
 
 // api backend 
 

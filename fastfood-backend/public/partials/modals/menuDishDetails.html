@@ -1,0 +1,52 @@
+<div class="modal fade" id="dishDetailsModal" tabindex="-1" aria-labelledby="dishModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+
+            <div class="modal-header d-flex justify-content-between align-items-center">
+                <h5 class="modal-title mb-0">
+                    <span id="dishName"></span>
+                    <span id="dishCategoryBadge" class="badge bg-secondary ms-2"></span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+                <div class="row g-3">
+
+                    <div class="col-md-5">
+                        <img id="dishPhoto" class="img-fluid rounded"
+                            loading="lazy">
+                    </div>
+
+                    <div class="col-12 col-md-7" aria-live="polite">
+
+                        <h5 class="fw-bold mb-2"><span id="dishPrice"></span></h5>
+
+                        <div id="dishIngredientsWrapper">
+                            <h6>Ingredients</h6>
+                            <ul id="dishIngredientsList" class="list-unstyled mb-3"></ul>
+                        </div>
+
+                        <div id="dishAllergensWrapper">
+                            <h6>Allergens</h6>
+                            <ul id="dishAllergensList" class="list-inline mb-3">
+                            </ul>
+                        </div>
+
+                        <div>
+                            <h6>Tags</h6>
+                            <div id="dishTags" class="d-flex flex-wrap gap-2"></div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                <button id="dishPrimaryAction" type="button" class="btn btn-secondary">Action</button>
+            </div>
+
+        </div>
+    </div>
+</div>
