@@ -40,3 +40,10 @@ export function hideAlert(node) {
     node.textContent = '';
     node.classList.add('d-none');
 }
+
+export function redirectUserHome() {
+        const payload = getDecodedJWT();
+
+        if (payload.userType === 'restaurateur') window.location.assign('/owner/restaurant');
+        else window.location.assign('/restaurants');
+}

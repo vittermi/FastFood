@@ -3,7 +3,10 @@ const router = express.Router();
 const { check, validationResult } = require('express-validator');
 const userController = require('../controllers/user.controller');
 const auth = require('../auth.middleware');
-const { UserTypes } = require('../utils/enums'); 
+const { UserTypes } = require('../utils/enums');
+
+
+router.get('/me', auth, userController.me);
 
 router.post(
     '/',

@@ -105,26 +105,14 @@ class OrdersManager {
         return this.orders.filter(order => order.status === this.statuses[this.currentStatus]);
     }
 
-    sortOrdersList(orders) {
-        return orders.sort((a, b) => {
-            const dateA = new Date(a.createdAt);
-            const dateB = new Date(b.createdAt);
-
-            return this.sortOrder === 'newest'
-                ? dateB - dateA  // Newest first
-                : dateA - dateB; // Oldest first
-        });
-    }
-
     renderOrders() {
         this.elements.headerTitle.textContent = this.currentStatus === 'all'
             ? 'All Orders'
             : `${this.statuses[this.currentStatus]} Orders`;
 
         const filtered = this.filterOrders();
-        const sortedOrders = this.sortOrdersList(filtered);
 
-        if (sortedOrders.length === 0) {
+        if (filtered.length === 0) {
             this.elements.emptyState.classList.remove('d-none');
             this.elements.ordersGrid.innerHTML = '';
             return;
@@ -133,7 +121,7 @@ class OrdersManager {
         this.elements.emptyState.classList.add('d-none');
         this.elements.ordersGrid.innerHTML = '';
 
-        sortedOrders.forEach(order => {
+        filtered.forEach(order => {
             const orderCard = this.renderOrderCard(order);
             this.elements.ordersGrid.appendChild(orderCard);
         });
@@ -159,7 +147,7 @@ class OrdersManager {
                 <span class="badge ${badgeClass}">${order.status}</span>
                 </div>
                 <div class="card-body">
-                <p class="card-text fw-bold mb-1">${order.customer?.name || 'Customer'}</p>
+                <p class="card-text fw-bold mb-1">${order.customer?.username || 'Customer'}</p>
                 <p class="card-text text-muted small mb-3">${orderSummary}</p>
                 <div class="d-flex justify-content-between mb-2">
                     <span class="fw-bold">Total:</span>
@@ -171,15 +159,22 @@ class OrdersManager {
                 </div>
                 </div>
                 <div class="card-footer d-flex gap-2 justify-content-end">
-                <button class="btn btn-sm btn-outline-primary btn-order-view">View</button>
+                <button class="btn btn-sm btn-outline-danger btn-order-cancel d-none">Cancel</button>
                 <button class="btn btn-sm btn-success btn-order-advance-status">Next Status</button>
                 </div>
             </div>
         `;
 
         const card = col.querySelector('.order-card');
-        card.querySelector('.btn-order-view').addEventListener('click', () => this.viewOrderDetails(order._id));
-        card.querySelector('.btn-order-advance-status').addEventListener('click', () => this.updateOrderStatus(order));
+        const orderCancelButton = card.querySelector('.btn-order-cancel');
+
+        orderCancelButton.addEventListener('click', () => this.cancelOrder(order));
+        this.orderCanBeCancelled(order).then(canCancel => {
+            if (canCancel) orderCancelButton.classList.remove('d-none');
+        });
+
+        card.querySelector('.btn-order-advance-status').addEventListener('click', () => this.changeOrderStatus(order));
+
 
         return col;
     }
@@ -225,36 +220,18 @@ class OrdersManager {
         this.renderOrders();
     }
 
-    async updateOrderStatus(order) {
+    async changeOrderStatus(order) {
         try {
-
-            const transitionsRes = await authFetch(`/api/orders/${order._id}/transitions`);
-            if (!transitionsRes.ok) {
-                const err = await transitionsRes.json().catch(() => ({}));
-                throw new Error(err.message || 'Failed to fetch transitions');
-            }
-            const { transitions = [] } = await transitionsRes.json();
+            const { transitions = [] } = await this.getAvailableOrderTransitions(order);
 
             if (transitions.length === 0) {
                 alert('No valid next status for this order.');
                 return;
             }
 
+            // Per semplicita. Funziona perchè la FSM degli ordini non è complessa
             const nextStatus = transitions[0];
-
-
-            const response = await authFetch(`/api/orders/${order._id}/status`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ newStatus: nextStatus })
-            });
-
-            if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.message || 'Failed to update status');
-            }
+            await this.updateOrderStatus(order, nextStatus);
 
             await this.loadOrders();
             this.renderOrders();
@@ -265,16 +242,64 @@ class OrdersManager {
         }
     }
 
-    async viewOrderDetails(orderId) {
-        // This would typically open a modal with order details
-        // For now, just alert the order ID
-        alert(`View order details for ${orderId}`);
+    async cancelOrder(order) {
 
-        // In a real app, you would:
-        // 1. Fetch detailed order data
-        // 2. Open a modal with the details
-        // 3. Allow more actions like cancellation, etc.
+        try {
+            const cancelledStatus = 'Cancelled';
+
+            if (!this.orderCanBeCancelled(order)) {
+                alert('Order cannot be cancelled.');
+                return;
+            }
+
+            await this.updateOrderStatus(order, cancelledStatus);
+            
+            await this.loadOrders();
+            this.renderOrders();
+
+        } catch (error) {
+            console.error('Error canceling order:', error);
+            alert(error.message || 'Failed to cancel order');
+        }
     }
+
+    async orderCanBeCancelled(order) {
+        const cancelledStatus = 'Cancelled';
+        const transitions = await this.getAvailableOrderTransitions(order, true);
+
+        return Array.isArray(transitions) && transitions.includes(cancelledStatus);
+    }
+
+    async getAvailableOrderTransitions(order, includeCancel = false) {
+        const transitionsRes = await authFetch(`/api/orders/${order._id}/transitions?includeCancel=${includeCancel}`);
+        if (!transitionsRes.ok) {
+            const err = await transitionsRes.json().catch(() => ({}));
+            throw new Error(err.message || 'Failed to fetch transitions');
+        }
+
+        const { transitions = [] } = await transitionsRes.json();
+        return transitions;
+
+    }
+
+
+    async updateOrderStatus(order, nextStatus) {
+
+        const response = await authFetch(`/api/orders/${order._id}/status`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ newStatus: nextStatus })
+        });
+
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || 'Failed to update status');
+        }
+
+    }
+
 
     showError(message) {
         this.elements.ordersGrid.innerHTML = `

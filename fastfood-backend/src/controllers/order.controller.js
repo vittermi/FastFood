@@ -1,6 +1,7 @@
 const Order = require('../models/Order');
 const Dish = require('../models/Dish');
 const Restaurant = require('../models/Restaurant');
+const User = require('../models/User');
 const { OrderStatus } = require('../utils/enums');
 const { isValidTransition, computeAllowedTransitions } = require('../utils/orderStateMachine');
 
@@ -10,6 +11,10 @@ exports.createOrder = async (req, res) => {
         const items = req.body.items;
         const restaurantId = req.body.restaurantId;
 
+        const user = await User.findById(customerId);
+        
+        if (user.role !== 'customer') return res.status(403).json({ message: 'Forbidden' });
+        
         let totalAmount = 0;
         const itemsDerivedInfo = [];
 
@@ -60,7 +65,8 @@ exports.getOrdersByRestaurant = async (req, res) => {
 
 exports.getOrdersByCustomer = async (req, res) => {
     try {
-        const orders = await Order.find({ customer: req.user.id }).populate('items.dish', 'name price');
+        const orders = await Order.find({ customer: req.user.id }).populate('items.dish', 'name price')
+        .populate('restaurant', 'name');
         res.json(orders);
     } catch (err) {
         console.error(`Error fetching orders: ${err.message}`);

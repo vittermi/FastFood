@@ -1,0 +1,39 @@
+<div class="modal fade" id="userMenuModal" tabindex="-1" aria-labelledby="userMenuTitle" aria-hidden="true">
+    <div class="modal-dialog modal-sm ms-auto mt-0 me-0">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="userMenuTitle">User menu</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+                <div class="d-grid gap-3">
+
+                    <button type="button" id="btnManageAccount" class="btn btn-outline-primary text-start"
+                        data-visible-for="both">
+                        Manage Account
+                    </button>
+
+                    <button type="button" id="btnPreferences" class="btn btn-outline-primary text-start"
+                        data-visible-for="customer">
+                        Preferences
+                    </button>
+
+                    <button type="button" id="btnUserOrders" class="btn btn-outline-primary text-start"
+                        data-visible-for="customer">
+                        My Orders
+                    </button>
+
+                    <button type="button" id="btnLogout" class="btn btn-outline-danger text-start" data-visible-for="both">
+                        Log Out
+                    </button>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script type="module" src="../js/user-menu.js"></script>

@@ -150,6 +150,7 @@ class OrdersManager {
                 <span class="badge ${badgeClass}">${order.status}</span>
                 </div>
                 <div class="card-body">
+                <p class="card-text fw-bold mb-1">${order.restaurant?.name || 'Unknown Restaurant'}</p>
                 <p class="card-text text-muted small mb-3">${orderSummary}</p>
                 <div class="d-flex justify-content-between mb-2">
                     <span class="fw-bold">Total:</span>

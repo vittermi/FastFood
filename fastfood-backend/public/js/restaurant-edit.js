@@ -1,4 +1,5 @@
-import { setImage } from './utils.js';
+import { setImage, hideAlert, showAlert} from './utils.js';
+import { authFetch } from './auth.js';
 
 export async function init(props = {}) {
     const root = document;
@@ -9,15 +10,19 @@ export async function init(props = {}) {
     const btnSave = root.getElementById('btnSaveProfile');
     const btnCancel = root.getElementById('btnCancelEdit');
 
+    const alertBox = document.getElementById('editRestAlert');
+    hideAlert(alertBox);
+
     btnSave?.addEventListener('click', async () => {
+
         try {
-            const payload = collectRestaurantFromForm(root, restaurantData?.id);
+            const payload = collectRestaurantFromForm(root, restaurantData?._id);
             const saved = await updateRestaurant(payload); 
-            // on success (or even optimistic), go back to view
+
             window.loadSection('restaurant-view', { restaurant: saved ?? payload });
         } catch (err) {
-            console.error('Failed to update restaurant', err);
-            alert('Failed to save changes');
+            console.error(err);
+            showAlert(alertBox, err?.message || 'Failed to save changes. Please try again.');
         }
     });
 
@@ -41,15 +46,16 @@ function renderCurrentRestaurantData(root, restaurantData = {}) {
         if (node) node.value = value?.trim() || '';
     }
 
-    renderHoursEditor(root, restaurantData.openingHours);
+    renderHoursEditor(root, restaurantData.hours);
 }
 
 function renderHoursEditor(root, hours) {
     const container = root.getElementById('hoursList');
     if (!container) return;
 
+
     const DAYS = [
-        'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'
+        'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'
     ];
 
     const data = normalizeHours(hours, DAYS);
@@ -88,13 +94,14 @@ function normalizeHours(hours, days) {
 }
 
 function collectRestaurantFromForm(root, id) {
+
     const coverImg = root.getElementById('restaurantCover');
     const name = root.getElementById('restaurantNameInput')?.value?.trim() ?? '';
     const address = root.getElementById('restaurantAddress')?.value?.trim() ?? '';
     const phone = root.getElementById('restaurantPhone')?.value?.trim() ?? '';
     const vat = root.getElementById('restaurantVat')?.value?.trim() ?? '';
 
-    const openingHours = readHours(root);
+    const hours = readHours(root);
 
     return {
         id,
@@ -103,7 +110,7 @@ function collectRestaurantFromForm(root, id) {
         phone,
         vat,
         coverUrl: coverImg?.src ?? '',
-        openingHours
+        hours
     };
 }
 
@@ -112,17 +119,34 @@ function readHours(root) {
     if (!container) return [];
     return [...container.querySelectorAll('[data-day-index]')].map(row => {
         const dayIdx = Number(row.dataset.dayIndex);
-        const dayName = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'][dayIdx];
+        const dayName = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'][dayIdx];
         const open = row.querySelector('[data-role="open"]').value || null;
         const close = row.querySelector('[data-role="close"]').value || null;
-        return { day: dayName, open, close, closed };
+        return { day: dayName, open, close};
     });
 }
 
 
 async function updateRestaurant(payload) {
-    // TODO: call your PUT/PATCH endpoint with `payload` and return the saved object
-    // e.g., const res = await authFetch('/api/restaurant', { method:'PUT', body: JSON.stringify(payload) });
-    // return await res.json();
-    return payload;
+
+    const res = await authFetch(`/api/restaurants/${payload.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    });
+    
+    if (!res.ok) {
+        let errMsg = 'Failed to update restaurant';
+
+        const errorData = await res.json();
+
+        if (Array.isArray(errorData.errors) && errorData.errors.length) {
+                const first = errorData.errors[0];
+                errMsg = first?.msg || first?.message || errMsg;
+        }
+
+        throw new Error(errMsg);
+    }
+
+    return res.json();
 }

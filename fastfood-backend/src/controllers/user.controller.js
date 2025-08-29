@@ -1,6 +1,22 @@
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 
+exports.me = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id);
+        if (!user) return res.status(404).json({ message: 'User not found' });
+
+        res.json({
+            username: user.username,
+            email: user.email,
+            userType: user.userType
+        });
+    } catch (err) {
+        console.error(`Error fetching user info: ${err.message}`);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
 exports.register = async (req, res) => {
     console.log('Processing register request:', req.body);
     try {

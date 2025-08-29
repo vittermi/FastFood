@@ -1,43 +1,25 @@
 <div class="container-fluid">
   <div class="row">
-    <!-- Mobile Status Nav (Horizontal Pills) - only visible on xs to sm -->
     <div class="col-12 d-block d-md-none mb-3">
       <nav class="nav nav-pills flex-row flex-nowrap overflow-auto gap-2 py-2" id="orderStatusNavMobile">
-        <!-- Status buttons will be populated by JS -->
       </nav>
     </div>
 
-    <!-- Desktop Status Nav (Vertical Sidebar) - only visible on md+ -->
     <div class="col-md-3 col-lg-2 d-none d-md-block">
       <nav class="nav nav-pills flex-column position-sticky top-0 pt-3" id="orderStatusNavDesktop">
-        <!-- Status buttons will be populated by JS -->
       </nav>
     </div>
 
-    <!-- Orders Area -->
     <div class="col-12 col-md-9 col-lg-10">
-      <!-- Header with current status -->
       <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 id="ordersHeaderTitle">All Orders</h2>
-        <div class="dropdown">
-          <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="orderSortDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-            Sort by
-          </button>
-          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="orderSortDropdown">
-            <li><button class="dropdown-item" data-sort="newest">Newest First</button></li>
-            <li><button class="dropdown-item" data-sort="oldest">Oldest First</button></li>
-          </ul>
-        </div>
       </div>
 
-      <!-- Empty state (hidden by default) -->
       <div id="ordersEmpty" class="alert alert-light text-center d-none">
         <p class="mb-0">No orders found for the selected status.</p>
       </div>
 
-      <!-- Orders grid -->
       <div id="ordersGrid" class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-3">
-        <!-- Order cards will be populated by JS -->
       </div>
     </div>
   </div>

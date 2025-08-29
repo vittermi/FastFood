@@ -1,5 +1,7 @@
 import { authFetch } from './auth.js';
 import { showAlert, hideAlert } from './utils.js';
+import { getCurrentUserInfo } from './modules/api.js';
+import { showUserMenuModal } from './modals/user-menu-modal.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     const form = document.getElementById('editUserForm');
@@ -7,8 +9,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     const btnEditUser = document.getElementById('btnEditUser');
     const userTypeSelect = document.getElementById('userTypeSelect');
 
-    const types = await getAvailableUserTypes();
-    populateUserTypes(userTypeSelect, types);
+    const userData = await getCurrentUserInfo();
+    if (userData) {
+        document.getElementById('usernameInput').value = userData.username || '';
+        document.getElementById('emailInput').value = userData.email || '';
+        userTypeSelect.value = userData.userType || '';
+    }
+
+    document.getElementById('menuButton').addEventListener('click', () => {
+        showUserMenuModal();
+    });
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -45,23 +55,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         hideAlert(alertBox);
     });
 });
-
-function populateUserTypes(selectEl, types) {
-    for (const t of types) {
-        const opt = document.createElement('option');
-        opt.value = t.value;
-        opt.textContent = t.label;
-        selectEl.appendChild(opt);
-    }
-}
-
-// Mock function to simulate fetching user types from an API
-async function getAvailableUserTypes() {
-    return [
-        { value: 'restaurateur', label: 'Restaurateur' },
-        { value: 'customer', label: 'Customer' },
-    ];
-}
 
 async function updateUserInfo(payload) {
     const response = await authFetch('/api/users', {
