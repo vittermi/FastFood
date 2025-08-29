@@ -1,7 +1,14 @@
-import { authFetch } from './auth.js';
+import { authFetch, ensureAccessToken } from './auth.js';
 import { showAlert, hideAlert } from './utils.js';
+import { redirectUserHome } from './utils.js';
+
+
 
 document.addEventListener('DOMContentLoaded', async () => {
+
+    const token = await ensureAccessToken();
+    if (token) return redirectUserHome();
+
     const form = document.getElementById('registerForm');
     const alertBox = document.getElementById('registerAlert');
     const btnRegister = document.getElementById('btnRegister');
@@ -28,8 +35,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         try {
             btnRegister.disabled = true;
-            const result = await registerUser(payload); 
-            
+            const result = await registerUser(payload);
+
             window.location.href = '/login.html';
             console.log('Registered:', result);
         } catch (err) {

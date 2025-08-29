@@ -1,7 +1,15 @@
-import { setAccessToken, getDecodedJWT } from './auth.js';
+import { ensureAccessToken, setAccessToken } from './auth.js';
+import { hideAlert, showAlert } from './utils.js';
+import { redirectUserHome } from './utils.js';
 
 
-document.addEventListener('DOMContentLoaded', () => {
+
+
+document.addEventListener('DOMContentLoaded', async () => {
+
+    const token = await ensureAccessToken();
+    if (token) return redirectUserHome();
+
     const form = document.querySelector('form');
     const emailInput = document.getElementById('emailInput');
     const passwordInput = document.getElementById('passwordInput');
@@ -19,14 +27,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const email = emailInput.value.trim();
         const password = passwordInput.value;
         if (!email || !password) {
-            showError('Email and password are required.');
+            showAlert(alertPlaceholder, 'Email and password are required.');
             return;
         }
 
         //todo email format validation 
 
         submitBtn.disabled = true;
-        hideError();
+        hideAlert(alertPlaceholder);
 
         try {
             const res = await fetch('/api/auth/login', {
@@ -48,29 +56,19 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const { accessToken } = await res.json();
-            if (!accessToken) throw new Error('Server did not return an access token');
+            if (!accessToken) throw new Error('Authentication failed');
 
             setAccessToken(accessToken);
+            redirectUserHome();
 
-            const payload = getDecodedJWT();
-
-            if (payload.userType === 'restaurateur') window.location.assign('/owner/restaurant');
-            else window.location.assign('/restaurants');
+          
         } catch (err) {
             console.error(err);
-            showError(err.message || 'Unexpected error – please try again.');
+            showAlert(alertPlaceholder, err.message || 'Unexpected error – please try again.');
         } finally {
             submitBtn.disabled = false;
             passwordInput.value = '';
         }
     });
 
-    function showError(msg) {
-        alertPlaceholder.textContent = msg;
-        alertPlaceholder.classList.remove('d-none');
-    }
-
-    function hideError() {
-        alertPlaceholder.classList.add('d-none');
-    }
 });

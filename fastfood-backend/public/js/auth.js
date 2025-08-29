@@ -49,7 +49,7 @@ export function getDecodedJWT() {
     if (!token) {
         logoutAndRedirect();
         throw new Error('Not authenticated, please log in.');
-    } 
+    }
 
     try {
         const payload = token.split('.')[1];
@@ -63,6 +63,20 @@ export function getDecodedJWT() {
         return JSON.parse(jsonPayload);
     } catch {
         return {};
+    }
+}
+
+export async function ensureAccessToken() {
+    const existing = getAccessToken();
+    if (existing) return existing; 
+    try {
+        const res = await fetch('/api/auth/refresh-token', { method: 'POST', credentials: 'include' });
+        if (!res.ok) return null;
+        const { accessToken } = await res.json();
+        setAccessToken(accessToken);
+        return accessToken;
+    } catch {
+        return null;
     }
 }
 
