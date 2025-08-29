@@ -1,8 +1,11 @@
 import { authFetch } from './auth.js';  
 import { debounce } from './utils.js';
+import { showUserMenuModal } from './modals/user-menu-modal.js';
 
 
 document.addEventListener('DOMContentLoaded', () => {
+    
+    const menuButton = document.getElementById('menuButton');
     const openNowToggle = document.getElementById('openNowToggle');
     const categorySelect = document.getElementById('categorySelect');
     const searchInput = document.getElementById('searchInput');
@@ -16,6 +19,9 @@ document.addEventListener('DOMContentLoaded', () => {
     openNowToggle.addEventListener('change', loadRestaurants);
     categorySelect.addEventListener('change', loadRestaurants);
     searchInput.addEventListener('keyup', debounce(loadRestaurants, 300));
+    menuButton.addEventListener('click', () => {
+        showUserMenuModal();
+    });
 
     loadRestaurants();
 

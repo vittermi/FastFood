@@ -1,7 +1,7 @@
 const PARTIAL_URL = '/partials/modals/menuDishDetails.html';
 let modalInstance = null;
 
-export async function ensureLoaded() {
+async function ensureLoaded() {
     if (document.getElementById('dishDetailsModal')) return;
 
     const res = await fetch(PARTIAL_URL);
@@ -28,8 +28,6 @@ export async function openDishDetailsModal(dish, options = {}) {
 
     modalInstance.show();
 }
-
-
 
 function populateModal(modalEl, dish, placeholderImage) {
     modalEl.querySelector('#dishName').textContent = dish.name || '';

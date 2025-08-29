@@ -48,7 +48,8 @@ exports.getOrdersByRestaurant = async (req, res) => {
     try {
         const restaurant = await Restaurant.findOne({ owner: req.user.id }).select('_id').lean().exec();
 
-        const orders = await Order.find({ restaurant }).populate('items.dish', 'name price');
+        const orders = await Order.find({ restaurant }).populate('items.dish', 'name price')
+        .populate('customer', 'username');
         res.json(orders);
     } catch (err) {
         console.error(`Error fetching orders: ${err.message}`);

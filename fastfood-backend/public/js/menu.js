@@ -1,5 +1,6 @@
 import { authFetch } from './auth.js';
 import { debounce } from './utils.js';
+import { showUserMenuModal } from './modals/user-menu-modal.js';
 
 
 class RestaurantMenu {
@@ -12,6 +13,7 @@ class RestaurantMenu {
         this.LS_KEY = 'restaurant_cart';
 
         this.elements = {
+            menuButton: document.getElementById('menuButton'),  
             menuList: document.getElementById('menu-list'),
             searchInput: document.getElementById('dishSearch'),
             clearBtn: document.getElementById('clearSearch'),
@@ -20,6 +22,7 @@ class RestaurantMenu {
             cartTotalDesktop: document.getElementById('cartTotal'),
             cartTotalMobile: document.getElementById('cartTotalMobile'),
             mobileCartCount: document.getElementById('mobileCartCount'),
+            cartButtonMobile: document.getElementById('cartButtonMobile'),
             checkoutBtnDesk: document.getElementById('checkoutBtn'),
             checkoutBtnMob: document.getElementById('checkoutBtnMobile'),
             menuPageTitle: document.getElementById('menuPageTitle')
@@ -29,6 +32,8 @@ class RestaurantMenu {
         this.dishes = [];
         this.filtered = [];
         this.cart = this.loadCart();
+
+        this.cartModal = null;
 
         this.init = this.init.bind(this);
         this.fetchRestaurantData = this.fetchRestaurantData.bind(this);
@@ -55,6 +60,9 @@ class RestaurantMenu {
             this.renderMenu();
             this.renderCart();
 
+            const modalEl = document.getElementById('cart-modal');
+            if (modalEl) this.cartModal = new bootstrap.Modal(modalEl);
+
             this.setupEventListeners();
         } catch (error) {
             console.error('Initialization error:', error);
@@ -77,8 +85,22 @@ class RestaurantMenu {
             this.renderMenu();
         });
 
+        window.addEventListener('resize', () => {
+            debugger;
+            if (window.innerWidth >= 768 && this.cartModal) 
+                this.cartModal.hide();
+        });
+
+        this.elements.cartButtonMobile.addEventListener('click', () => {
+            if (this.cartModal) this.cartModal.show();
+        });
+
         this.elements.checkoutBtnDesk.addEventListener('click', this.checkout);
         this.elements.checkoutBtnMob.addEventListener('click', this.checkout);
+
+        this.elements.menuButton.addEventListener('click', () => {
+            showUserMenuModal();
+        });
     }
 
     async fetchRestaurantData() {
@@ -138,7 +160,6 @@ class RestaurantMenu {
             <div class="d-flex justify-content-between">
                 <div>
                 <h5 class="card-title mb-1">${dish.name}</h5>
-                <p class="card-text text-muted small mb-2">${dish.description || ''}</p>
                 <span class="fw-bold">${dish.price.toFixed(2)} €</span>
                 </div>
                 <div class="ms-3 d-flex align-items-center gap-2">
@@ -295,5 +316,7 @@ class RestaurantMenu {
 document.addEventListener('DOMContentLoaded', () => {
     const menu = new RestaurantMenu();
     menu.init();
+
+
 });
 

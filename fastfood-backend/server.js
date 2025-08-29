@@ -10,8 +10,6 @@ const swaggerDocument = YAML.load('./swagger.yml');
 
 const path = require('path')
 
-
-
 dotenv.config();
 const app = express();
 
@@ -63,12 +61,14 @@ app.get('/restaurants', (_req, res) => res.sendFile(path.join(pagePath, 'browse-
 
 app.get('/menu/:id', (req, res) => {
     const restaurantId = req.params.id;
-    res.sendFile(path.join(pagePath, 'menu.html'));
+    res.sendFile(path.join(pagePath, 'menu.html')); //todo wtf
 });
 
 app.get('/owner/restaurant', (_req, res) => res.sendFile(path.join(pagePath, 'manage-restaurant.html')));
 
 app.get('/register', (_req, res) => res.sendFile(path.join(pagePath, 'register.html')));
+app.get('/user/edit', (_req, res) => res.sendFile(path.join(pagePath, 'edit-user.html')));
+app.get('/customer/orders', (_req, res) => res.sendFile(path.join(pagePath, 'customer-orders.html')));
 
 // api backend 
 

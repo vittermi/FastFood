@@ -24,6 +24,12 @@ exports.register = async (req, res) => {
 
 exports.update = async (req, res) => {
     try {
+        const user = await User.findById(req.params.id);
+        if (!user) return res.status(404).json({ message: 'User not found' });
+
+        const isMatch = await bcrypt.compare(req.body.currentPassword, user.password);
+        if (!isMatch) return res.status(401).json({ message: 'Current password is incorrect' });
+
         await User.findByIdAndUpdate(req.params.id, req.body);
         res.json({ message: 'User updated' });
     } catch (err) {

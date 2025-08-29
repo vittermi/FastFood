@@ -20,7 +20,24 @@ router.post(
     },
     userController.register
 );
-router.put('/:id', auth, userController.update);
+
+router.patch(
+    '/:id', 
+    [
+        check('email').isEmail(),
+        check('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters long'),
+        check('currentPassword').notEmpty().withMessage('Please insert current password'),
+        check('userType').isIn(Object.values(UserTypes)).withMessage('Invalid user type'),
+    ],
+    auth,
+    (req, res, next) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+        next();
+    },
+    userController.update
+);
+
 router.delete('/:id', auth, userController.remove);
 
 module.exports = router;
