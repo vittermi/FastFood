@@ -37,9 +37,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             btnRegister.disabled = true;
             const result = await registerUser(payload);
 
-            window.location.href = '/login.html';
+            window.location.href = '/login';
             console.log('Registered:', result);
         } catch (err) {
+            debugger;
             showAlert(alertBox, err?.message || 'Registration failed. Please try again.');
         } finally {
             btnRegister.disabled = false;

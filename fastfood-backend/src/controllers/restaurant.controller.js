@@ -40,9 +40,9 @@ exports.getRestaurants = async (req, res) => {
     try {
         const filters = {};
 
-        //todo aggiungi luogo
         if (req.query.owner) filters.owner = req.query.owner;
         if (req.query.name) filters.name = { $regex: req.query.name, $options: 'i' };
+        if (req.query.address) filters.address = { $regex: req.query.address, $options: 'i' };
         if (req.query.openAt) {
             const [day, time] = req.query.openAt.split(',');
             if (day && time) {

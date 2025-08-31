@@ -1,13 +1,16 @@
+import { showUserMenuModal } from "/js/modals/user-menu-modal.js";
+
 const PARTIALS = '/partials';
 
 const mainEl = document.getElementById('main-content');
 const navLinks = document.querySelectorAll('nav .nav-link');
-const logoutBtn = document.getElementById('logoutBtn');
-
+const menuButton = document.getElementById('menuButton');
 
 document.addEventListener('DOMContentLoaded', () => {
     const nowActive = document.querySelector('nav .nav-link.active');
     loadSection(nowActive ? nowActive.dataset.view : 'restaurant');
+
+    menuButton.addEventListener('click', () => showUserMenuModal());
 });
 
 navLinks.forEach(link => {

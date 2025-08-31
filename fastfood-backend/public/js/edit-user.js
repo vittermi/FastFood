@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         try {
             btnEditUser.disabled = true;
-            const result = await updateUserInfo(payload);
+            const result = await updateUserInfo(payload, userData.id);
 
             // todo aggiungi logout?
 
@@ -56,12 +56,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 });
 
-async function updateUserInfo(payload) {
-    const response = await authFetch('/api/users', {
+async function updateUserInfo(payload, userId) {
+    const response = await authFetch(`/api/users/${userId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
     });
+
+    debugger;
 
     if (!response.ok) {
         const errorData = await response.json();

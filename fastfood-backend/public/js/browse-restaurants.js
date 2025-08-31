@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const openNowToggle = document.getElementById('openNowToggle');
     const categorySelect = document.getElementById('categorySelect');
     const searchInput = document.getElementById('searchInput');
+    const searchInputAddress = document.getElementById('searchInputAddress');
     const filterToggleBtn = document.getElementById('filter-toggle');
     const filters = document.getElementById('filters');
     const restaurantList = document.getElementById('restaurant-list');
@@ -19,6 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     openNowToggle.addEventListener('change', loadRestaurants);
     categorySelect.addEventListener('change', loadRestaurants);
     searchInput.addEventListener('keyup', debounce(loadRestaurants, 300));
+    searchInputAddress.addEventListener('keyup', debounce(loadRestaurants, 300));
     menuButton.addEventListener('click', () => {
         showUserMenuModal();
     });
@@ -42,6 +44,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const name = searchInput.value.trim();
             if (name) qs.append('name', name);
+
+            const address = searchInputAddress.value.trim();
+            if (address) qs.append('address', address);
 
             const res = await authFetch(`/api/restaurants${qs.toString() ? '?' + qs : ''}`);
 

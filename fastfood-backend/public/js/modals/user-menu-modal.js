@@ -1,7 +1,9 @@
+import { logoutAndRedirect } from "/js/auth.js";
+import { getCurrentUserInfo } from "/js/modules/api.js";
+
 const PARTIAL_URL = '/partials/modals/userMenu.html';
 
 export async function showUserMenuModal() {
-
 
     async function ensureLoaded() {
         if (document.getElementById('userMenuModal')) return;
@@ -15,10 +17,27 @@ export async function showUserMenuModal() {
 
     const modalEl = document.getElementById('userMenuModal');
 
+    await handleButtonVisibility();
     setupButtonListeners(modalEl);
 
     const modalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
     modalInstance.show();
+}
+
+async function handleButtonVisibility() {
+    try {
+        const user = await getCurrentUserInfo();
+        const userType = user.userType;
+
+        const buttons = document.querySelectorAll('[data-visible-for]');
+
+        buttons.forEach(button => {
+            const visibleFor = button.getAttribute('data-visible-for');
+            if (!(visibleFor === 'both') && !(visibleFor === userType)) button.classList.add('d-none');
+        });
+    } catch (error) {
+        console.error('Failed to handle button visibility:', error);
+    }
 }
 
 
@@ -44,18 +63,13 @@ function setupButtonListeners(modalEl) {
 
     modalEl.querySelector('#btnLogout').addEventListener('click', async () => {
         try {
-            await logout();
-            window.location.href = '/login';
+            await logoutAndRedirect();
         } catch (error) {
             console.error('Error during logout:', error);
-            // You might want to show an error notification here
         } finally {
             modalInstance.hide();
         }
     });
 }
 
-async function logout() {
-    alert('Logging out...');
-    //todo 
-}
+
