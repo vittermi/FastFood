@@ -80,6 +80,7 @@ app.use('/api/auth', require('./src/routes/auth.routes'));
 app.use('/api/orders', require('./src/routes/order.routes'));
 app.use('/api/restaurants', require('./src/routes/restaurant.routes'));
 app.use('/api/dishes', require('./src/routes/dish.routes'));
+app.use('/api/statistics', require('./src/routes/statistics.routes'));
 
 
 const PORT = process.env.PORT || 5000;

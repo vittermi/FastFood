@@ -1,9 +1,9 @@
-export function getAccessToken() {
-    return sessionStorage.getItem('accessToken');
-}
-
 export function setAccessToken(token) {
     sessionStorage.setItem('accessToken', token);
+}
+
+function getAccessToken() {
+    return sessionStorage.getItem('accessToken');
 }
 
 async function refreshAccessToken() {
@@ -18,10 +18,17 @@ async function refreshAccessToken() {
     }
 }
 
-function logoutAndRedirect() {
+
+export async function logoutAndRedirect() {
+    const response = await authFetch('/api/auth/logout', { method: 'POST' });
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Logout failed');
+    }
     sessionStorage.removeItem('accessToken');
-    window.location.href = '/login.html';
+    window.location.href = '/login';
 }
+
 
 export async function authFetch(url, options = {}) {
     options.headers = options.headers || {};

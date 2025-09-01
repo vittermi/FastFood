@@ -16,4 +16,14 @@ const orderSchema = new mongoose.Schema({
     createdAt: { type: Date, default: Date.now }
 });
 
+orderSchema.index({ createdAt: -1 }, { background: true }); 
+orderSchema.index({ status: 1 }, { background: true });
+orderSchema.index({ restaurant: 1, createdAt: -1 }, { background: true }); 
+orderSchema.index({ 'items.dish': 1 }, { background: true }); 
+
+orderSchema.index(
+  { restaurant: 1, status: 1, createdAt: -1 },
+  { partialFilterExpression: { status: OrderStatus.Delivered }, background: true }
+);
+
 module.exports = mongoose.model('Order', orderSchema);

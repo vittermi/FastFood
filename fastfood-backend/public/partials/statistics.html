@@ -1,0 +1,95 @@
+<div class="container-fluid">
+
+    <section class="mb-4" aria-labelledby="statsFiltersHeading">
+        <h2 id="statsFiltersHeading" class="visually-hidden">Statistics Filters</h2>
+        <div class="row g-2 align-items-end">
+            <div class="col-12 col-sm-auto">
+                <label for="statsRangeSelect" class="form-label mb-1">Last X days</label>
+                <select id="statsRangeSelect" class="form-select">
+                    <option value="1">1d</option>
+                    <option value="7">1w</option>
+                    <option value="30">1m</option>
+                    <option value="365" selected>1y</option>
+                </select>
+            </div>
+
+            <div class="col-12 col-sm-auto">
+                <button id="btnApplyStatsRange" class="btn btn-primary w-100"
+                    aria-label="Apply selected range">Apply</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="mb-4" aria-labelledby="kpiHeading" aria-live="polite">
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-3">
+
+            <div class="col">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <p class="text-muted mb-1 small">Delivered revenue (€)</p>
+                        <div class="display-6 fw-semibold" id="totalRevenue">—</div>
+                        <div class="text-muted small mt-2"><span class="metricRangeLabel"></span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <p class="text-muted mb-1 small">Average order value (€)</p>
+                        <div class="display-6 fw-semibold" id="avgOrderAmount">—</div>
+                        <div class="text-muted small mt-2"><span class="metricRangeLabel"></span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <p class="text-muted mb-1 small">Total orders</p>
+                        <div class="display-6 fw-semibold" id="totalOrdersNumber">—</div>
+                        <div class="text-muted small mt-2"><span class="metricRangeLabel"></span></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <section class="mb-4" aria-labelledby="ordersChartHeading" aria-live="polite">
+        <h2 id="ordersChartHeading" class="h5 mb-3">Orders per day</h2>
+        <div class="card">
+            <div class="card-body">
+                <div class="position-relative">
+                    <canvas id="ordersDailyChart" aria-label="Line chart of orders per day" role="img"></canvas>
+                    <p id="ordersChartEmpty" class="text-muted d-none mt-2">No data</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="mb-4" aria-labelledby="productsListsHeading">
+        <h2 id="productsListsHeading" class="visually-hidden">Products ranking</h2>
+        <div class="row g-3">
+
+            <div class="col-12 col-md-6">
+                <div class="card h-100" id="mostProductsCard">
+                    <div class="card-header">Most ordered products</div>
+                    <ul class="list-group list-group-flush" id="mostProductsList">
+                    </ul>
+                    <div id="mostProductsEmpty" class="text-muted p-3 d-none">No data</div>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-6">
+                <div class="card h-100" id="leastProductsCard">
+                    <div class="card-header">Least ordered products</div>
+                    <ul class="list-group list-group-flush" id="leastProductsList">
+                    </ul>
+                    <div id="leastProductsEmpty" class="text-muted p-3 d-none">No data</div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+</div>
