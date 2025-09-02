@@ -128,8 +128,6 @@ function readHours(root) {
 
 
 async function updateRestaurant(payload) {
-    debugger;
-
     const res = await authFetch(`/api/restaurants/${payload.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },

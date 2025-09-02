@@ -30,7 +30,6 @@ export async function open() {
         const limit = 25;
 
         async function loadTemplateDishesPage(page) {
-            debugger;
             const categoryQuery = categoriesEl.value === 'All Categories' ? '' : `category=${categoriesEl.value}`;
             const result = await getTemplateDishesForPage(page, limit, categoryQuery);
             if (!result) return;
