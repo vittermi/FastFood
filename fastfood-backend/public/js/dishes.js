@@ -14,9 +14,9 @@ export async function init() {
     await loadDishes();
     renderDishCards();
 
-    searchInput.addEventListener('input', debounce(async () => {
-        const q = searchInput.value.trim();
-        await loadDishes(q);
+    searchInput.addEventListener('keyup', debounce(async () => {
+        const name = searchInput.value.trim();
+        await loadDishes(name);
         renderDishCards();
     }, 300));
 
@@ -30,12 +30,12 @@ export async function init() {
 }
 
 
-async function loadDishes(query = '') {
+async function loadDishes(name = '') {
     try {
         const restaurantId = await getRestaurantId();
 
-        const url = query
-            ? `/api/restaurants/${restaurantId}/dishes?q=${encodeURIComponent(query)}`
+        const url = name
+            ? `/api/restaurants/${restaurantId}/dishes?name=${encodeURIComponent(name)}`
             : `/api/restaurants/${restaurantId}/dishes`;
         const res = await authFetch(url);
         dishes = await res.json();

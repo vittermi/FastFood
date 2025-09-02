@@ -30,7 +30,9 @@ export async function open() {
         const limit = 25;
 
         async function loadTemplateDishesPage(page) {
-            const result = await getTemplateDishesForPage(page, limit);
+            debugger;
+            const categoryQuery = categoriesEl.value === 'All Categories' ? '' : `category=${categoriesEl.value}`;
+            const result = await getTemplateDishesForPage(page, limit, categoryQuery);
             if (!result) return;
             const { data, pagination } = result;
 
@@ -39,10 +41,19 @@ export async function open() {
             gridEl._dishTemplates.push(...data);
             
             if (page >= pagination.totalPages) {
-                moreBtn?.removeEventListener('click', onMore);
-                moreBtn?.remove();
+                moreBtn?.classList.add('d-none');
+            } else {
+                moreBtn?.classList.remove('d-none');
             }
         }
+
+        async function updateCategories() {
+            page = 1;
+            gridEl.innerHTML = '';
+            await loadTemplateDishesPage(page);
+        }
+        categoriesEl.addEventListener('change', updateCategories);
+
 
         await loadTemplateDishesPage(page);
 
@@ -117,8 +128,15 @@ async function getCategories() {
 }
 
 
-async function getTemplateDishesForPage(page, limit = 25) {
+async function getTemplateDishesForPage(page, limit = 25, query = '') {
     try {
+
+        if (query) {
+            const encodedQuery = query;
+            const res = await authFetch(`/api/dishes/templates?page=${page}&limit=${limit}&${encodedQuery}`);
+            return res.json();
+        }
+
         const res = await authFetch(`/api/dishes/templates?page=${page}&limit=${limit}`);
         return res.json();
     } catch (err) {

@@ -58,6 +58,7 @@ exports.getTemplateDishes = async (req, res) => {
 
         const filters = {};
         if (req.query.type) filters.type = req.query.type;
+        if (req.query.category) filters.category = req.query.category;
 
         const templates = await DishTemplate.find(filters)
             .skip(skip)
