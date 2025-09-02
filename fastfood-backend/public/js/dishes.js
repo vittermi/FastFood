@@ -121,7 +121,28 @@ async function initModals() {
             // user cancelled or modal closed
         }
     });
+
+
+    document.getElementById('dish-cards-list').addEventListener('click', async (e) => {
+        const btn = e.target.closest('.edit-dish-btn');
+        if (!btn) return;
+        const dishId = btn.dataset.id;
+       
+        try {
+            const editModal = await import('/js/modals/edit-dish-modal.js');
+            const dish = dishes.find(d => d._id === dishId);
+            const updated = await editModal.open({ initialData: dish });
+            if (updated.action === 'edit') await updateDish(updated);
+            else if (updated.action === 'delete') await deleteDish(updated);
+
+            await loadDishes();
+            renderDishCards();
+        } catch (err) {
+            // user cancelled or modal closed
+        }
+    });
 }
+
 
 
 async function createDish(dishData, selectedDishTemplate = {}) {
@@ -143,5 +164,47 @@ async function createDish(dishData, selectedDishTemplate = {}) {
         });
     } catch (err) {
         alert(err.message || 'Failed to create dish');
+    }
+}
+
+
+async function updateDish(dishData) {
+
+    if (!dishData.id) throw new Error('No dish ID provided');
+    
+    if (dishData.price) dishData.price = parseFloat(dishData.price);
+    const templateDish = dishData.baseDish;
+
+    if (templateDish) {
+        ['ingredients', 'tags', 'allergens'].forEach(type => {
+            const submittedItems = Array.isArray(dishData[type]) ? dishData[type] : [];
+            const itemsInTemplateDish = Array.isArray(templateDish[type]) ? templateDish[type] : [];
+            dishData[type] = submittedItems.filter(item => !itemsInTemplateDish.includes(item));
+        });
+    }
+
+    dishData.baseDish = templateDish?._id || null;
+
+    try {
+        await authFetch(`/api/dishes/${dishData.id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(dishData),
+        });
+    } catch (err) {
+        alert(err.message || 'Failed to update dish');
+    }
+}
+
+
+async function deleteDish(dishData) {
+    if (!dishData.id) throw new Error('No dish ID provided');
+
+    try {
+        await authFetch(`/api/dishes/${dishData.id}`, {
+            method: 'DELETE',
+        });
+    } catch (err) {
+        alert(err.message || 'Failed to delete dish');
     }
 }

@@ -1,44 +1,58 @@
 import { authFetch } from "../auth.js";
 
-const PARTIAL_URL = '/partials/modals/createDish.html';
+const PARTIAL_URL = '/partials/modals/editDish.html';
 
 export async function ensureLoaded() {
-    if (document.getElementById('createDishModal')) return;
+    if (document.getElementById('editDishModal')) return;
     const res = await fetch(PARTIAL_URL);
     if (!res.ok) throw new Error(`Failed to load ${PARTIAL_URL}`);
     document.body.insertAdjacentHTML('beforeend', await res.text());
 }
 
 
-export async function open({ prefill = null } = {}) {
+export async function open({ initialData }) {
     await ensureLoaded();
 
     return new Promise((resolve, reject) => {
-        const modalEl = document.getElementById('createDishModal');
+        const modalEl = document.getElementById('editDishModal');
         const formEl = modalEl.querySelector('form');
         const bsModal = bootstrap.Modal.getOrCreateInstance(modalEl);
 
         formEl.reset();
-        if (prefill) applyPrefill(formEl, prefill);
+        if (initialData) applyPrefill(formEl, initialData);
 
         const cleanUpChips = setupChipElements(modalEl);
         const categoriesEl = modalEl.querySelector('#dishCategory');
-        loadCategories(categoriesEl, prefill?.category);
+        loadCategories(categoriesEl, initialData.category);
 
-        const onSubmit = (e) => {
+        const onSubmit = async (e) => {
             e.preventDefault();
 
-            const data = formToObject(new FormData(formEl));
+            const action = e.submitter?.dataset?.role;
 
-            data.ingredients = getChipValues(modalEl, 'ingredients');
-            data.tags = getChipValues(modalEl, 'tags');
-            data.allergens = getChipValues(modalEl, 'allergens');
+            if (action === 'edit-dish') {
+                const baseDish = initialData.baseDish ? await getTemplateDishById(initialData.baseDish) : null;
 
-            cleanup();
-            bsModal.hide();
+                const data = formToObject(new FormData(formEl));
+                data.id = initialData._id;
+                data.baseDish = baseDish;
+                data.ingredients = getChipValues(modalEl, 'ingredients');
+                data.tags = getChipValues(modalEl, 'tags');
+                data.allergens = getChipValues(modalEl, 'allergens');
+                data.action = 'edit';
 
-            // ritorna una promise con i dati inseriti nel form
-            resolve(data);
+                cleanup();
+                bsModal.hide();
+
+                resolve(data);
+            } else if (action === 'delete-dish') {
+                const data = { id: initialData._id, action: 'delete' };
+                
+                cleanup();
+                bsModal.hide();
+
+                resolve(data);
+            }
         };
 
         const onHidden = () => {
@@ -97,8 +111,8 @@ export async function open({ prefill = null } = {}) {
             return [...box.querySelectorAll('.chip')].map(c => c.dataset.value).filter(Boolean);
         }
 
-        function applyPrefill(formEl, dishTemplate) {
-            if (!formEl || !dishTemplate) return;
+        function applyPrefill(formEl, updDishData) {
+            if (!formEl || !updDishData) return;
 
             const root = formEl;
 
@@ -108,9 +122,9 @@ export async function open({ prefill = null } = {}) {
                 el.value = (val ?? '') + '';
             };
 
-            setById('dishName', dishTemplate.name);
-            setById('dishPrice', dishTemplate.price);
-            setById('dishImage', dishTemplate.photo ?? dishTemplate.imageUrl);
+            setById('dishName', updDishData.name);
+            setById('dishPrice', updDishData.price);
+            setById('dishImage', updDishData.photo ?? updDishData.imageUrl);
 
             const applyChips = (type, values = []) => {
                 const box = root.querySelector(`#${type}ChipBox`);
@@ -120,9 +134,9 @@ export async function open({ prefill = null } = {}) {
                 values.filter(Boolean).forEach(v => addChip(box, input, v));
             };
 
-            applyChips('ingredients', dishTemplate.ingredients);
-            applyChips('tags', dishTemplate.tags);
-            applyChips('allergens', dishTemplate.allergens);
+            applyChips('ingredients', updDishData.ingredients);
+            applyChips('tags', updDishData.tags);
+            applyChips('allergens', updDishData.allergens);
         }
 
         function cleanup() {
@@ -163,6 +177,15 @@ async function loadCategories(selectEl, templateDishCategory) {
 async function getCategories() {
     try {
         const res = await authFetch(`/api/dishes/categories`);
+        return res.json();
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+async function getTemplateDishById(id) {
+    try {
+        const res = await authFetch(`/api/dishes/templates/${id}`);
         return res.json();
     } catch (err) {
         console.error(err);

@@ -1,14 +1,14 @@
-<div class="modal fade" id="createDishModal" tabindex="-1" aria-labelledby="createDishModalLabel" aria-hidden="true">
+<div class="modal fade" id="editDishModal" tabindex="-1" aria-labelledby="editDishModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
 
             <div class="modal-header">
-                <h5 class="modal-title" id="createDishModalLabel">Create New Dish</h5>
+                <h5 class="modal-title" id="editDishModalLabel">Edit Dish</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
             <div class="modal-body">
-                <form id="createDishForm" autocomplete="off">
+                <form id="editDishForm" autocomplete="off">
                     <div class="mb-3">
                         <label for="dishName" class="form-label">Dish Name</label>
                         <input type="text" class="form-control" id="dishName" name="name" placeholder="Dish name"
@@ -63,8 +63,11 @@
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     Cancel
                 </button>
-                <button type="submit" class="btn btn-primary" data-role="create-dish" form="createDishForm">
-                    Create Dish
+                <button type="submit" class="btn btn-danger" data-role="delete-dish" form="editDishForm">
+                    Delete
+                </button>
+                <button type="submit" class="btn btn-primary" data-role="edit-dish" form="editDishForm">
+                    Submit
                 </button>
             </div>
         </div>

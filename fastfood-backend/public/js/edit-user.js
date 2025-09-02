@@ -63,8 +63,6 @@ async function updateUserInfo(payload, userId) {
         body: JSON.stringify(payload)
     });
 
-    debugger;
-
     if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Update failed');

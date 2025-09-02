@@ -18,6 +18,9 @@ export async function open() {
         const moreBtn = document.getElementById('moreBtn');
         const bsModal = bootstrap.Modal.getOrCreateInstance(modalEl);
 
+        const categoriesEl = modalEl.querySelector('#modalCategoryFilter');
+        loadCategories(categoriesEl);
+
         searchForm.reset();
 
         const gridEl = modalEl.querySelector('[data-role="template-list"]');
@@ -73,12 +76,44 @@ export async function open() {
 
         bsModal.show();
 
-                function cleanup() {
+        function cleanup() {
             modalEl.removeEventListener('click', onSelect);
             modalEl.removeEventListener('hidden.bs.modal', onHidden);
             moreBtn.removeEventListener('click', onMoreBtnClick);
+            categoriesEl.querySelectorAll('option[data-generated]').forEach(o => o.remove());
         }
     });
+}
+
+
+async function loadCategories(selectEl) {
+    if (!selectEl) return;
+
+    try {
+        const payload = await getCategories();
+        const categories = Array.isArray(payload.data) ? payload.data : payload;
+
+        if (!categories || !categories.length) return;
+
+        categories.forEach(cat => {
+            const opt = document.createElement('option');
+            opt.value = cat;
+            opt.textContent = cat;
+            opt.dataset.generated = '1';
+            selectEl.appendChild(opt);
+        });
+    } catch (err) {
+        console.error('Error loading categories', err);
+    }
+} 
+
+async function getCategories() {
+    try {
+        const res = await authFetch(`/api/dishes/categories`);
+        return res.json();
+    } catch (err) {
+        console.error(err);
+    }
 }
 
 

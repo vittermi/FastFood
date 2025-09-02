@@ -13,6 +13,10 @@ async function main() {
 }
 
 async function importDishesIfEmpty() {
+
+    //todo aggiungi a relazione
+    await DishTemplate.collection.createIndex({ category: 1 });
+
     const dishCount = await DishTemplate.countDocuments();
     if (dishCount > 0) {
         console.log('Collection is not empty, import skipped.');
@@ -33,7 +37,7 @@ function transformDishData(dish) {
     return {
         name: dish.strMeal,
         ingredients: dish.ingredients,
-        allergens: [], // al momento non sono previsti allergeni
+        allergens: [], // Allergeni aggiunti manualmente da ristoratore
         category: dish.strCategory || '',
         tags: dish.strTags ? dish.strTags.split(',').map(tag => tag.trim()) : [],
         photo: dish.strMealThumb || ''

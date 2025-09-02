@@ -40,7 +40,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             window.location.href = '/login';
             console.log('Registered:', result);
         } catch (err) {
-            debugger;
             showAlert(alertBox, err?.message || 'Registration failed. Please try again.');
         } finally {
             btnRegister.disabled = false;

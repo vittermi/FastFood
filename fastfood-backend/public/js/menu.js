@@ -86,7 +86,6 @@ class RestaurantMenu {
         });
 
         window.addEventListener('resize', () => {
-            debugger;
             if (window.innerWidth >= 768 && this.cartModal) 
                 this.cartModal.hide();
         });

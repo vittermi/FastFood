@@ -132,7 +132,7 @@ class OrdersManager {
         col.className = 'col';
 
         const orderSummary = order.items.map(item =>
-            `${item.quantity}× ${item.dish.name || 'Unknown item'}`
+            `${item.quantity}× ${item.dish?.name || 'Unknown item'}`
         ).join(', ');
 
         const orderDate = this.formatDate(order.createdAt);
