@@ -30,9 +30,9 @@ const bodyValidatorArray =
         ...days.map(day =>
             body('hours')
                 .custom((value) => {
-                    const match = value.find(h => h.day === day);
+                    const match = value?.find(h => h.day === day);
                     if (!match) return true; // se un giorno manca, il ristorante è chiuso
-                    if (!match.open || !match.close) throw new Error(`${day} must have open and close`);
+                    if (!match.open || !match.close) throw new Error(`${day.charAt(0).toUpperCase() + day.slice(1)} must have open and close`);
                     return true;
                 })
         )

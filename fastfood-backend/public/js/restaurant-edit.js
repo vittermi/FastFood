@@ -123,11 +123,12 @@ function readHours(root) {
         const open = row.querySelector('[data-role="open"]').value || null;
         const close = row.querySelector('[data-role="close"]').value || null;
         return { day: dayName, open, close};
-    });
+    }).filter(h => h.day && (h.open || h.close));
 }
 
 
 async function updateRestaurant(payload) {
+    debugger;
 
     const res = await authFetch(`/api/restaurants/${payload.id}`, {
         method: 'PUT',
@@ -137,14 +138,8 @@ async function updateRestaurant(payload) {
     
     if (!res.ok) {
         let errMsg = 'Failed to update restaurant';
-
         const errorData = await res.json();
-
-        if (Array.isArray(errorData.errors) && errorData.errors.length) {
-                const first = errorData.errors[0];
-                errMsg = first?.msg || first?.message || errMsg;
-        }
-
+        errMsg = errorData?.message || errMsg;
         throw new Error(errMsg);
     }
 
