@@ -4,8 +4,7 @@ const { OrderStatus } = require('../utils/enums');
 
 const allowedTransitions = {
     [OrderStatus.ORDERED]: [OrderStatus.PREPARATION, OrderStatus.CANCELLED],
-    [OrderStatus.PREPARATION]: [OrderStatus.READY, OrderStatus.CANCELLED],
-    [OrderStatus.READY]: [OrderStatus.DELIVERY, OrderStatus.DELIVERED],
+    [OrderStatus.PREPARATION]: [OrderStatus.DELIVERY, OrderStatus.DELIVERED],
     [OrderStatus.DELIVERY]: [OrderStatus.DELIVERED],
     [OrderStatus.DELIVERED]: [],
     [OrderStatus.CANCELLED]: [],

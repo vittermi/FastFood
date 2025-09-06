@@ -2,7 +2,7 @@ const Order = require('../models/Order');
 const Dish = require('../models/Dish');
 const Restaurant = require('../models/Restaurant');
 const User = require('../models/User');
-const { OrderStatus } = require('../utils/enums');
+const { OrderStatus, UserTypes } = require('../utils/enums');
 const { isValidTransition, computeAllowedTransitions } = require('../utils/orderStateMachine');
 
 exports.createOrder = async (req, res) => {
@@ -13,7 +13,7 @@ exports.createOrder = async (req, res) => {
 
         const user = await User.findById(customerId);
         
-        if (user.role !== 'customer') return res.status(403).json({ message: 'Forbidden' });
+        if (user?.userType !== UserTypes.CUSTOMER) return res.status(403).json({ message: 'Forbidden' });
         
         let totalAmount = 0;
         const itemsDerivedInfo = [];
@@ -65,15 +65,70 @@ exports.getOrdersByRestaurant = async (req, res) => {
 
 exports.getOrdersByCustomer = async (req, res) => {
     try {
-        const orders = await Order.find({ customer: req.user.id }).populate('items.dish', 'name price')
-        .populate('restaurant', 'name');
-        res.json(orders);
+
+        const orders = await Order.find({ customer: req.user.id })
+            .populate('items.dish', 'name price')
+            .populate('restaurant', 'name');
+
+        const processedOrders = await Promise.all(orders.map(async (order) => {
+            const orderObj = order.toObject();
+            
+            if (orderObj.status === OrderStatus.ORDERED) {
+                const estimatedMinutes = await calculateEstimatedPreparationTimeMins(order);
+                orderObj.estimatedPreparationTime = estimatedMinutes;
+            }
+            
+            return orderObj;
+        }));
+
+        res.json(processedOrders);
     } catch (err) {
         console.error(`Error fetching orders: ${err.message}`);
         res.status(500).json({ message: err.message });
     }
 }
 
+
+async function calculateEstimatedPreparationTimeMins(order) {
+
+    const populateOpts = {
+        path: 'items.dish',
+        select: 'ingredients baseDish',
+        populate: {
+            path: 'baseDish',
+            model: 'DishTemplate',
+            select: 'ingredients'
+        }
+    };
+    
+    const earlierOrders = await Order.find({
+        restaurant: order.restaurant._id,
+        status: { $in: [OrderStatus.ORDERED, OrderStatus.PREPARATION] },
+        createdAt: { $lt: order.createdAt }
+    }).populate(populateOpts).lean();
+
+    const currentOrder = await Order.findById(order._id).populate(populateOpts).lean();
+
+    const earlierAndCurrentOrders = [currentOrder, ...earlierOrders];
+    
+    let additionalTime = 0;
+
+    for (const orderToProcess of earlierAndCurrentOrders) {
+        for (const item of orderToProcess.items) {
+            const dish = item.dish; // sbajato?
+            if (!dish) continue;
+            
+            let ingredients = dish.ingredients || [];
+            if (dish.baseDish && dish.baseDish.ingredients && dish.baseDish.ingredients.length > 0) 
+                ingredients = dish.baseDish.ingredients;
+            
+            const dishComplexity = Math.max(1, ingredients.length / 2); 
+            additionalTime += item.quantity * dishComplexity;
+        }
+    }
+    
+    return Math.round(additionalTime);
+}
 
 exports.getOrderById = async (req, res) => {
     try {
@@ -123,6 +178,12 @@ exports.getAvailableTransitions = async (req, res) => {
 
 exports.updateStatus = async (req, res) => {
     try {
+
+        const customerId = req.user.id;
+        const user = await User.findById(customerId);
+        
+        if (user?.userType !== UserTypes.RESTAURATEUR) return res.status(403).json({ message: 'Forbidden' });
+
         const { newStatus } = req.body;
 
         if (!newStatus) return res.status(400).json({ message: 'New status is required' });

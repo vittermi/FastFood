@@ -222,15 +222,18 @@ class OrdersManager {
 
     async changeOrderStatus(order) {
         try {
-            const { transitions = [] } = await this.getAvailableOrderTransitions(order);
+            const transitions = await this.getAvailableOrderTransitions(order);
 
             if (transitions.length === 0) {
-                alert('No valid next status for this order.');
-                return;
+                throw new Error('No valid next status for this order.');
             }
 
-            // Per semplicita. Funziona perchè la FSM degli ordini non è complessa
-            const nextStatus = transitions[0];
+            let nextStatus;
+
+            // In caso di delivery disponibile logica va modificata
+            if (order.status === 'In Preparation') nextStatus = 'Delivered';
+            else nextStatus = transitions[0];
+
             await this.updateOrderStatus(order, nextStatus);
 
             await this.loadOrders();

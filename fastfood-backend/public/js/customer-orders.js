@@ -160,32 +160,33 @@ class OrdersManager {
                     <span>Placed:</span>
                     <span>${orderDate}, ${orderTime}</span>
                 </div>
+                <span class="badge bg-dark d-none etp">${order.estimatedPreparationTime} mins</span>
                 </div>
                 <div class="card-footer d-flex gap-2 justify-content-end">
                 <button class="btn btn-sm btn-outline-danger btn-order-cancel disabled">Cancel</button>
-                <button class="btn btn-sm btn-success btn-order-confirm-delivery d-none">Delivered</button>
                 </div>
             </div>
         `;
 
         const card = col.querySelector('.order-card');
+        this.manageOrderCardItems(card, order);
+
+        return col;
+    }
+
+    manageOrderCardItems(card, order) {
         const orderCancelButton = card.querySelector('.btn-order-cancel');
-        const orderConfirmDeliveryButton = card.querySelector('.btn-order-confirm-delivery');
 
         orderCancelButton.addEventListener('click', () => this.cancelOrder(order));
         this.orderCanBeCancelled(order).then(canCancel => {
             if (canCancel) orderCancelButton.classList.remove('disabled');
         });
 
-        //orderConfirmDeliveryButton.addEventListener('click', () => this.confirmDelivery(order));
-        this.orderCanBeDelivered(order).then(canDeliver => {
-            if (canDeliver) orderConfirmDeliveryButton.classList.remove('d-none');
-        });
+        if (order.status === 'Ordered' && order.estimatedPreparationTime) {
+            const estTimeDiv = card.querySelector('.etp');
+            if (estTimeDiv) estTimeDiv.classList.remove('d-none');
+        }
 
-        //card.querySelector('.btn-order-confirm-delivery').addEventListener('click', () => this.confirmDelivery(order));
-
-
-        return col;
     }
 
     setupEventListeners() {
@@ -323,9 +324,8 @@ class OrdersManager {
         const statusMap = {
             'Ordered': 'bg-warning',
             'In Preparation': 'bg-info',
-            'Ready': 'bg-primary',
-            'In delivery': 'bg-success',
-            'Delivered': 'bg-secondary',
+            'In delivery': 'bg-secondary',
+            'Delivered': 'bg-success',
             'Cancelled': 'bg-danger'
         };
 
