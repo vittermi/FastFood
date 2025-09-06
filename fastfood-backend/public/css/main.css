@@ -7,6 +7,11 @@ body {
     font-family: "Nata Sans", sans-serif;
 }
 
+#loginFormContainer {
+    max-width: 420px;
+    margin-top: 100px;
+}
+
 .restaurant-card {
     border: none;
     border-radius: 0.5rem;
@@ -19,11 +24,23 @@ body {
     max-height: 200px;
 }
 
+.restaurant-cover {
+    height: 270px;
+}
+
+.restaurant-hours-entry {
+    min-width: 80px;
+}
+
 .sidebar {
     background-color: #ffffff;
     padding: 1rem;
     border-radius: 0.5rem;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+}
+
+.templatedish-card {
+    width: 120px;
 }
 
 .filter-toggle {
@@ -32,14 +49,4 @@ body {
 
 .filters-desktop {
     display: block;
-}
-
-@media (max-width: 768px) {
-    .filter-toggle {
-        display: block;
-    }
-
-    #filters.mobile-hidden {
-        display: none;
-    }
 }

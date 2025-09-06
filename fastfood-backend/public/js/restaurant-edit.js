@@ -65,7 +65,7 @@ function renderHoursEditor(root, hours) {
         const closeVal = h.close ?? '';
         return `
         <div class="d-flex align-items-center mb-2" data-day-index="${i}">
-            <span class="text-muted small me-2" style="min-width: 80px;">${DAYS[i]}</span>
+            <span class="text-muted small me-2 restaurant-hours-entry">${DAYS[i]}</span>
             <input type="time" class="form-control w-auto" data-role="open" value="${openVal}">
             <span class="mx-1">–</span>
             <input type="time" class="form-control w-auto" data-role="close" value="${closeVal}">

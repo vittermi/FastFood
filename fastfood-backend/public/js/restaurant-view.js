@@ -65,11 +65,10 @@ function renderRestaurant(restaurant) {
             const value = formatHoursEntry(dailyOpeningHours[day]);
 
             const row = document.createElement('div');
-            row.className = 'd-flex align-items-center mb-2';
+            row.className = 'd-flex align-items-center mb-2 restaurant-hours-entry';
 
             const left = document.createElement('span');
             left.className = 'text-muted small me-2';
-            left.style.minWidth = '80px'; // move to css global style
             left.textContent = label;
 
 

@@ -30,7 +30,6 @@ app.use(
       ],
       styleSrc: [
         "'self'",
-        "'unsafe-inline'", // non sicurissimo ma c'est la vie
         "https://cdn.jsdelivr.net", // bootstrap
         "https://fonts.googleapis.com", // google fonts
       ],

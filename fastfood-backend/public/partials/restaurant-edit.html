@@ -1,16 +1,9 @@
-<!-- ======= Restaurant Profile Edit Partial (specular layout) ======= -->
-
-<!-- Hero editable -->
-<div class="position-relative w-100 mb-4" style="height: 270px;">
-    <!-- Editable Cover Image -->
-    <img id="restaurantCover" alt="Restaurant Cover" class="w-100 h-100 object-fit-cover img-desaturated"
-        style="min-height: 200px; max-height: 320px;">
-    <!-- Pencil overlay (affordance only) -->
+<div class="position-relative w-100 mb-4 restaurant-cover">
+    <img id="restaurantCover" alt="Restaurant Cover" class="w-100 h-100 object-fit-cover img-desaturated">
     <button type="button" class="btn btn-light btn-sm position-absolute top-0 end-0 m-2 edit-icon-overlay"
         aria-label="Change cover image">
         <i class="bi bi-pencil-fill" aria-hidden="true"></i>
     </button>
-    <!-- Name overlay (now editable) -->
     <div class="position-absolute bottom-0 start-0 p-4 bg-dark bg-opacity-50 rounded-end">
         <input type="text" class="form-control-plaintext text-white fw-bold p-0 m-0 display-5" id="restaurantNameInput"
             aria-label="Restaurant name">
@@ -24,7 +17,6 @@
                 <div class="card-body">
                     <div id="editRestAlert" class="alert alert-danger d-none" role="alert"></div>
 
-                    <!-- Owner (read-only) -->
                     <div class="p-3 border rounded bg-light mb-4">
                         <div class="row">
                             <label for="restaurantOwnerUsername"
@@ -43,7 +35,6 @@
                         </div>
                     </div>
 
-                    <!-- Restaurant details (editable) -->
                     <div class="mb-4">
                         <div class="row mb-2">
                             <label for="restaurantAddress"
@@ -69,7 +60,6 @@
                         </div>
                     </div>
 
-                    <!-- Opening Hours tab (structure only) -->
                     <dl>
                         <dt class="col-12 col-md-11 offset-md-1 mt-3 mb-4 fw-bold">Opening Hours</dt>
                         <div id="hoursList" class="d-flex flex-column align-items-center"></div>

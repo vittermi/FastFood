@@ -147,7 +147,6 @@ function templateDishesHtml(templateDish, i) {
     const dishCard = document.createElement('div');
     dishCard.className = 'templatedish-card card mb-3 mx-2"';
     dishCard.dataset.index = i;
-    dishCard.style.width = '120px';
     dishCard.innerHTML = `
     <img src="${templateDish.photo}" class="card-img-top rounded" alt="${templateDish.name}">
     <div class="card-body p-2">

@@ -14,7 +14,6 @@ async function main() {
 
 async function importDishesIfEmpty() {
 
-    //todo aggiungi a relazione
     await DishTemplate.collection.createIndex({ category: 1 });
 
     const dishCount = await DishTemplate.countDocuments();
