@@ -1,7 +1,5 @@
-import { authFetch, ensureAccessToken } from './auth.js';
-import { showAlert, hideAlert } from './utils.js';
-import { redirectUserHome } from './utils.js';
-
+import { authFetch, ensureAccessToken } from '/js/modules/auth.js';
+import { showAlert, hideAlert, redirectUserHome } from '/js/modules/utils.js';
 
 
 document.addEventListener('DOMContentLoaded', async () => {

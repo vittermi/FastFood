@@ -1,4 +1,4 @@
-import { authFetch } from './auth.js';
+import { authFetch } from '/js/modules/auth.js';
 
 class OrdersManager {
     constructor() {

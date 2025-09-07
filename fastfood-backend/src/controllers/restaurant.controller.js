@@ -81,6 +81,7 @@ exports.getRestaurantById = async (req, res) => {
 
 exports.updateRestaurant = async (req, res) => {
     try {
+        // todo aggiungi blocco owner
         const updatedRestaurant = await Restaurant.findByIdAndUpdate(req.params.id, req.body, { new: true });
         res.json({ updatedRestaurant });
     } catch (err) {

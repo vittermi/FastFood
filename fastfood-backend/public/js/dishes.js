@@ -1,6 +1,5 @@
-import { authFetch } from './auth.js';
-import { getRestaurantId } from './utils.js';
-import { debounce } from './utils.js';
+import { authFetch } from '/js/modules/auth.js';
+import { getRestaurantId, debounce } from '/js/modules/utils.js';
 
 let dishes = [];
 let filtered = [];

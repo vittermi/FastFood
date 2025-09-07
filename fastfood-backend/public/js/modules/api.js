@@ -1,4 +1,4 @@
-import { authFetch } from '../auth.js';
+import { authFetch } from '/js/modules/auth.js';
 
 
 async function updateUserInfo(payload) {
@@ -24,6 +24,16 @@ export async function getCurrentUserInfo() {
     }
     return await response.json();
 }
+
+export async function fetchRestaurantData(restaurantId) {
+    const res = await authFetch(`/api/restaurants/${restaurantId}`);
+    if (!res.ok) throw new Error('Failed to fetch restaurant');
+
+    return res.json();
+}
+
+
+
 
 
 

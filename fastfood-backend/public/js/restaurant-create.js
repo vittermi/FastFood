@@ -1,23 +1,24 @@
 import { setImage, hideAlert, showAlert} from '/js/modules/utils.js';
 import { authFetch } from '/js/modules/auth.js';
+import { getCurrentUserInfo } from "/js/modules/api.js";
 
-export async function init(props = {}) {
+
+
+export async function init() {
     const root = document;
-    const { restaurantData } = props;
+    const userInfo = await getCurrentUserInfo();
 
-    renderCurrentRestaurantData(root, restaurantData);
+    renderCurrentRestaurantData(root, userInfo);
 
     const btnSave = root.getElementById('btnSaveProfile');
-    const btnCancel = root.getElementById('btnCancelEdit');
-
-    const alertBox = document.getElementById('editRestAlert');
+    const alertBox = document.getElementById('createRestAlert');
     hideAlert(alertBox);
 
     btnSave?.addEventListener('click', async () => {
 
         try {
-            const payload = collectRestaurantFromForm(root, restaurantData?._id);
-            const saved = await updateRestaurant(payload); 
+            const payload = collectRestaurantFromForm(root);
+            const saved = await createRestaurant(payload);
 
             window.loadSection('restaurant-view', { restaurant: saved ?? payload });
         } catch (err) {
@@ -26,33 +27,25 @@ export async function init(props = {}) {
         }
     });
 
-    btnCancel?.addEventListener('click', () => {
-        window.loadSection('restaurant-view', { restaurantData });
-    });
 }
 
-function renderCurrentRestaurantData(root, restaurantData = {}) {
+function renderCurrentRestaurantData(root, userInfo = {}) {
 
-    setImage('restaurantCover', restaurantData.imageUrl, 'Restaurant Cover');
-    setText('restaurantNameInput', restaurantData.name);
-    setText('restaurantOwnerUsername', restaurantData.owner?.username);
-    setText('restaurantOwnerEmail', restaurantData.ownerEmail ?? restaurantData.owner?.email ?? '');
-    setText('restaurantAddress', restaurantData.address);
-    setText('restaurantPhone', restaurantData.phone);
-    setText('restaurantVat', restaurantData.vat);
+    setImage('restaurantCover', null, 'Restaurant Cover');
+    setText('restaurantOwnerUsername', userInfo.username);
+    setText('restaurantOwnerEmail', userInfo.email ?? '');
 
     function setText(id, value) {
         const node = root.getElementById(id);
         if (node) node.value = value?.trim() || '';
     }
 
-    renderHoursEditor(root, restaurantData.hours);
+    renderHoursEditor(root, []);
 }
 
 function renderHoursEditor(root, hours) {
     const container = root.getElementById('hoursList');
     if (!container) return;
-
 
     const DAYS = [
         'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'
@@ -93,7 +86,8 @@ function normalizeHours(hours, days) {
     });
 }
 
-function collectRestaurantFromForm(root, id) {
+
+function collectRestaurantFromForm(root) {
 
     const coverImg = root.getElementById('restaurantCover');
     const name = root.getElementById('restaurantNameInput')?.value?.trim() ?? '';
@@ -104,7 +98,6 @@ function collectRestaurantFromForm(root, id) {
     const hours = readHours(root);
 
     return {
-        id,
         name,
         address,
         phone,
@@ -127,15 +120,15 @@ function readHours(root) {
 }
 
 
-async function updateRestaurant(payload) {
-    const res = await authFetch(`/api/restaurants/${payload.id}`, {
-        method: 'PUT',
+async function createRestaurant(payload) {
+    const res = await authFetch(`/api/restaurants`, {
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
     });
     
     if (!res.ok) {
-        let errMsg = 'Failed to update restaurant';
+        let errMsg = 'Failed to create restaurant';
         const errorData = await res.json();
         errMsg = errorData?.message || errMsg;
         throw new Error(errMsg);

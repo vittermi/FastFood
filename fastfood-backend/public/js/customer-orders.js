@@ -1,5 +1,5 @@
-import { authFetch } from './auth.js';
-import { showUserMenuModal } from './modals/user-menu-modal.js';
+import { authFetch } from '/js/modules/auth.js';
+import { showUserMenuModal } from '/js/modals/user-menu-modal.js';
 
 
 class OrdersManager {

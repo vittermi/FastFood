@@ -1,4 +1,5 @@
 import { showUserMenuModal } from "/js/modals/user-menu-modal.js";
+import { getRestaurantId } from "/js/modules/utils.js"; 
 
 const PARTIALS = '/partials';
 
@@ -6,25 +7,31 @@ const mainEl = document.getElementById('main-content');
 const navLinks = document.querySelectorAll('nav .nav-link');
 const menuButton = document.getElementById('menuButton');
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    const restaurantId = await getRestaurantId();
+    
+    if (!restaurantId) {
+        loadSection('restaurant-create');
+        return; 
+    }
+
+    setupNavigation();
+
     const nowActive = document.querySelector('nav .nav-link.active');
     loadSection(nowActive ? nowActive.dataset.view : 'restaurant');
 
     menuButton.addEventListener('click', () => showUserMenuModal());
 });
 
-navLinks.forEach(link => {
-
-    link.addEventListener('click', e => {
-        e.preventDefault();
-        setActive(link);
-
-        // todo aggiungi check ristorante esistente per user e load edit.
-        loadSection(link.dataset.view);
+function setupNavigation() {
+    navLinks.forEach(link => {
+        link.addEventListener('click', e => {
+            e.preventDefault();
+            setActive(link);
+            loadSection(link.dataset.view);
+        });
     });
-});
-
-
+}
 
 async function loadSection(sectionId, props = {}) {
 

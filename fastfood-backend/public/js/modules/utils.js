@@ -1,4 +1,4 @@
-import { getDecodedJWT, authFetch } from './auth.js';
+import { getDecodedJWT, authFetch } from '/js/modules/auth.js';
 
 export async function getRestaurantId() {
     const payload = getDecodedJWT();
@@ -9,7 +9,7 @@ export async function getRestaurantId() {
     if (!restaurantResponse.ok) throw new Error('Failed to fetch restaurant');
 
     const restaurantData = await restaurantResponse.json();
-    if (!restaurantData.length) throw new Error('No restaurant found for this user');
+    if (!restaurantData.length) return null;
 
     return restaurantData[0]._id;
 }

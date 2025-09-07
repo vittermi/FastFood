@@ -1,6 +1,6 @@
-import { authFetch } from './auth.js';
-import { debounce } from './utils.js';
-import { showUserMenuModal } from './modals/user-menu-modal.js';
+import { authFetch } from '/js/modules/auth.js';
+import { debounce } from '/js/modules/utils.js';
+import { showUserMenuModal } from '/js/modals/user-menu-modal.js';
 
 
 class RestaurantMenu {

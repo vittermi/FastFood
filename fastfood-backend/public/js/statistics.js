@@ -1,5 +1,5 @@
-import { authFetch } from './auth.js';
-import { showAlert } from './utils.js';
+import { authFetch } from '/js/modules/auth.js';
+import { showAlert } from '/js/modules/utils.js';
 import Chart from "https://cdn.jsdelivr.net/npm/chart.js@4.5.0/auto/+esm";
 
 

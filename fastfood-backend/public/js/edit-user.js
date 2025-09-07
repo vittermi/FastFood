@@ -1,7 +1,7 @@
-import { authFetch } from './auth.js';
-import { showAlert, hideAlert } from './utils.js';
-import { getCurrentUserInfo } from './modules/api.js';
-import { showUserMenuModal } from './modals/user-menu-modal.js';
+import { authFetch } from '/js/modules/auth.js';
+import { showAlert, hideAlert } from '/js/modules/utils.js';
+import { getCurrentUserInfo } from '/js/modules/api.js';
+import { showUserMenuModal } from '/js/modals/user-menu-modal.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     const form = document.getElementById('editUserForm');

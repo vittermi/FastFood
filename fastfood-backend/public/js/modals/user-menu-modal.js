@@ -1,4 +1,4 @@
-import { logoutAndRedirect } from "/js/auth.js";
+import { logoutAndRedirect } from "/js/modules/auth.js";
 import { getCurrentUserInfo } from "/js/modules/api.js";
 
 const PARTIAL_URL = '/partials/modals/userMenu.html';

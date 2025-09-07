@@ -1,6 +1,5 @@
-import { getRestaurantId } from './utils.js';
-import { authFetch } from './auth.js';
-import { setImage } from './utils.js';
+import { getRestaurantId, setImage } from '/js/modules/utils.js';
+import { fetchRestaurantData } from '/js/modules/api.js';
 
 
 export async function init() {
@@ -15,15 +14,6 @@ export async function init() {
         console.error(err);
     }
 }
-
-
-async function fetchRestaurantData(restaurantId) {
-    const res = await authFetch(`/api/restaurants/${restaurantId}`);
-    if (!res.ok) throw new Error('Failed to fetch restaurant');
-
-    return res.json();
-}
-
 
 function renderRestaurant(restaurant) {
 

@@ -1,6 +1,5 @@
-import { ensureAccessToken, setAccessToken } from './auth.js';
-import { hideAlert, showAlert } from './utils.js';
-import { redirectUserHome } from './utils.js';
+import { ensureAccessToken, setAccessToken } from '/js/modules/auth.js';
+import { hideAlert, showAlert, redirectUserHome} from '/js/modules/utils.js';
 
 
 
