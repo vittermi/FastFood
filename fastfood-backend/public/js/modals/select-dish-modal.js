@@ -1,6 +1,8 @@
-import { authFetch } from "./js/modules/auth.js";
+import { authFetch } from "/js/modules/auth.js";
 
 const PARTIAL_URL = '/partials/modals/selectDish.html';
+const limit = 25;
+
 
 export async function ensureLoaded() {
     if (document.getElementById('selectDishModal')) return;
@@ -14,55 +16,19 @@ export async function open() {
 
     return new Promise(async (resolve, reject) => {
         const modalEl = document.getElementById('selectDishModal');
-        const searchForm = document.getElementById('selectDishForm');
         const moreBtn = document.getElementById('moreBtn');
         const bsModal = bootstrap.Modal.getOrCreateInstance(modalEl);
-
         const categoriesEl = modalEl.querySelector('#modalCategoryFilter');
-        loadCategories(categoriesEl);
-
-        searchForm.reset();
-
         const gridEl = modalEl.querySelector('[data-role="template-list"]');
-        gridEl._dishTemplates = [];
 
         let page = 1;
-        const limit = 25;
-
-        async function loadTemplateDishesPage(page) {
-            const categoryQuery = categoriesEl.value === 'All Categories' ? '' : `category=${categoriesEl.value}`;
-            const result = await getTemplateDishesForPage(page, limit, categoryQuery);
-            if (!result) return;
-            const { data, pagination } = result;
-
-            const baseLength = gridEl._dishTemplates.length;
-            data.forEach((dish, i) => gridEl.appendChild(templateDishesHtml(dish, baseLength + i)));
-            gridEl._dishTemplates.push(...data);
-            
-            if (page >= pagination.totalPages) {
-                moreBtn?.classList.add('d-none');
-            } else {
-                moreBtn?.classList.remove('d-none');
-            }
-        }
-
-        async function updateCategories() {
-            page = 1;
-            gridEl.innerHTML = '';
-            await loadTemplateDishesPage(page);
-        }
-        categoriesEl.addEventListener('change', updateCategories);
+        gridEl._dishTemplates = [];
 
 
+        loadCategories(categoriesEl);
         await loadTemplateDishesPage(page);
 
-        function onMoreBtnClick() {
-            loadTemplateDishesPage(++page);
-        }
-
-        moreBtn.addEventListener('click', onMoreBtnClick);
-
-
+        
         const onSelect = (e) => {
             const card = e.target.closest('.templatedish-card');
             if (!card || !gridEl.contains(card)) return;
@@ -76,21 +42,58 @@ export async function open() {
             resolve(selectedTemplate);
         };
 
+        const onMoreBtnClick = () => {
+            loadTemplateDishesPage(++page);
+        };
+
+        const updateCategories = async () => {
+            page = 1;
+            gridEl.innerHTML = '';
+            await loadTemplateDishesPage(page);
+        };
+
         const onHidden = () => {
             cleanup();
             reject(new Error('cancelled'));
         };
-
+        
+        
         gridEl.addEventListener('click', onSelect);
+        moreBtn.addEventListener('click', onMoreBtnClick);
+        categoriesEl.addEventListener('change', updateCategories);
         modalEl.addEventListener('hidden.bs.modal', onHidden);
 
+        
         bsModal.show();
 
+
+        async function loadTemplateDishesPage(page) {
+            const categoryQuery = categoriesEl.value === 'All Categories' 
+                ? '' 
+                : `category=${categoriesEl.value}`;
+
+            const result = await getTemplateDishesForPage(page, limit, categoryQuery);
+            if (!result) return;
+
+            const { data, pagination } = result;
+            const baseLength = gridEl._dishTemplates.length;
+
+            data.forEach((dish, i) => gridEl.appendChild(templateDishesHtml(dish, baseLength + i)));
+            gridEl._dishTemplates.push(...data);
+            
+            if (page >= pagination.totalPages) moreBtn?.classList.add('d-none');
+            else moreBtn?.classList.remove('d-none');
+        }
+
+
         function cleanup() {
-            modalEl.removeEventListener('click', onSelect);
             modalEl.removeEventListener('hidden.bs.modal', onHidden);
             moreBtn.removeEventListener('click', onMoreBtnClick);
             categoriesEl.querySelectorAll('option[data-generated]').forEach(o => o.remove());
+            gridEl.removeEventListener('click', onSelect);
+            gridEl.innerHTML = '';
+            gridEl._dishTemplates = [];
+            page = 1;
         }
     });
 }
