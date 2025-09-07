@@ -7,7 +7,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const menuButton = document.getElementById('menuButton');
     const openNowToggle = document.getElementById('openNowToggle');
-    const categorySelect = document.getElementById('categorySelect');
     const searchInput = document.getElementById('searchInput');
     const searchInputAddress = document.getElementById('searchInputAddress');
     const filterToggleBtn = document.getElementById('filter-toggle');
@@ -18,7 +17,6 @@ document.addEventListener('DOMContentLoaded', () => {
         filters.classList.toggle('mobile-hidden'));
 
     openNowToggle.addEventListener('change', loadRestaurants);
-    categorySelect.addEventListener('change', loadRestaurants);
     searchInput.addEventListener('keyup', debounce(loadRestaurants, 300));
     searchInputAddress.addEventListener('keyup', debounce(loadRestaurants, 300));
     menuButton.addEventListener('click', () => {
@@ -38,9 +36,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const time = now.toTimeString().slice(0, 5); 
                 qs.append('openAt', `${day},${time}`);
             }
-
-            const cat = categorySelect.value;
-            if (cat && cat !== 'All Categories') qs.append('category', cat);
 
             const name = searchInput.value.trim();
             if (name) qs.append('name', name);
@@ -69,7 +64,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function card(r) {
         const img = r.imageUrl ?? '/img/placeholder.jpg';
-        const cat = r.category ?? 'N/A';
         const phone = r.phone ?? 'N/A';
         return `
         <div class="card restaurant-card mb-4">
@@ -81,7 +75,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="card-body">
                 <h5 class="card-title">${r.name}</h5>
                 <p class="card-text mb-1"><strong>Address:</strong> ${r.address}</p>
-                <p class="card-text mb-2"><strong>Category:</strong> ${cat}</p>
                 <p class="card-text mb-2"><strong>Phone:</strong> ${phone}</p>
                 <a href="/menu/${r._id}" class="btn btn-primary">View Menu</a>
                 </div>
