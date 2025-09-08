@@ -4,6 +4,20 @@ const Restaurant = require('../models/Restaurant');
 const User = require('../models/User');
 const { OrderStatus, UserTypes } = require('../utils/enums');
 const { isValidTransition, computeAllowedTransitions } = require('../utils/orderStateMachine');
+const Preference = require('../models/Preference');
+
+
+function isPaymentTypeSet(preference) {
+    if (!preference) return false;
+    if (preference.paymentType === 'cash') return true;
+    if (preference.paymentType === 'card') return !!(preference.cardDetails && preference.cardDetails.token);
+    return false;
+}
+
+function areRequiredConsentsGiven(preference) {
+    if (!preference || !preference.consents) return false;
+    return preference.consents.tos && preference.consents.privacy;
+}
 
 exports.createOrder = async (req, res) => {
     try {
@@ -14,12 +28,16 @@ exports.createOrder = async (req, res) => {
         const user = await User.findById(customerId);
         const preference = await Preference.findOne({ customer: customerId });
 
-        if (!preference || !preference.isPaymentTypeSet()) 
-            return res.status(400).json({ message: 'Payment method not set' });
-        
+        if (!preference) 
+            return res.status(400).json({ message: 'Please set your preferences before placing an order.' });
+        else if (!isPaymentTypeSet(preference))
+            return res.status(400).json({ message: 'Payment method not set.' });
+        else if (!areRequiredConsentsGiven(preference)) 
+            return res.status(400).json({ message: 'Please set required consents in preferences.' });
+
 
         if (user?.userType !== UserTypes.CUSTOMER) return res.status(403).json({ message: 'Forbidden' });
-        
+
         let totalAmount = 0;
         const itemsDerivedInfo = [];
 
@@ -59,7 +77,7 @@ exports.getOrdersByRestaurant = async (req, res) => {
         const restaurant = await Restaurant.findOne({ owner: req.user.id }).select('_id').lean().exec();
 
         const orders = await Order.find({ restaurant }).populate('items.dish', 'name price')
-        .populate('customer', 'username');
+            .populate('customer', 'username');
         res.json(orders);
     } catch (err) {
         console.error(`Error fetching orders: ${err.message}`);
@@ -77,12 +95,12 @@ exports.getOrdersByCustomer = async (req, res) => {
 
         const processedOrders = await Promise.all(orders.map(async (order) => {
             const orderObj = order.toObject();
-            
+
             if (orderObj.status === OrderStatus.ORDERED) {
                 const estimatedMinutes = await calculateEstimatedPreparationTimeMins(order);
                 orderObj.estimatedPreparationTime = estimatedMinutes;
             }
-            
+
             return orderObj;
         }));
 
@@ -105,7 +123,7 @@ async function calculateEstimatedPreparationTimeMins(order) {
             select: 'ingredients'
         }
     };
-    
+
     const earlierOrders = await Order.find({
         restaurant: order.restaurant._id,
         status: { $in: [OrderStatus.ORDERED, OrderStatus.PREPARATION] },
@@ -115,23 +133,23 @@ async function calculateEstimatedPreparationTimeMins(order) {
     const currentOrder = await Order.findById(order._id).populate(populateOpts).lean();
 
     const earlierAndCurrentOrders = [currentOrder, ...earlierOrders];
-    
+
     let additionalTime = 0;
 
     for (const orderToProcess of earlierAndCurrentOrders) {
         for (const item of orderToProcess.items) {
             const dish = item.dish; // sbajato?
             if (!dish) continue;
-            
+
             let ingredients = dish.ingredients || [];
-            if (dish.baseDish && dish.baseDish.ingredients && dish.baseDish.ingredients.length > 0) 
+            if (dish.baseDish && dish.baseDish.ingredients && dish.baseDish.ingredients.length > 0)
                 ingredients = dish.baseDish.ingredients;
-            
-            const dishComplexity = Math.max(1, ingredients.length / 2); 
+
+            const dishComplexity = Math.max(1, ingredients.length / 2);
             additionalTime += item.quantity * dishComplexity;
         }
     }
-    
+
     return Math.round(additionalTime);
 }
 
@@ -186,7 +204,7 @@ exports.updateStatus = async (req, res) => {
 
         const customerId = req.user.id;
         const user = await User.findById(customerId);
-        
+
         if (user?.userType !== UserTypes.RESTAURATEUR) return res.status(403).json({ message: 'Forbidden' });
 
         const { newStatus } = req.body;
@@ -196,14 +214,14 @@ exports.updateStatus = async (req, res) => {
         const order = await Order.findById(req.params.id);
         if (!order) return res.status(404).json({ message: 'Order not found' });
 
-        if ([OrderStatus.DELIVERED, OrderStatus.CANCELLED].includes(order.status)) 
+        if ([OrderStatus.DELIVERED, OrderStatus.CANCELLED].includes(order.status))
             return res.status(400).json({ message: `Order is ${order.status} and cannot transition` });
-        
-        if (!isValidTransition(order, newStatus)) 
+
+        if (!isValidTransition(order, newStatus))
             return res.status(400).json({ message: `Invalid status transition from "${order.status}" to "${newStatus}"` });
 
         order.status = newStatus;
-        
+
         await order.save();
         res.status(200).json(order);
     } catch (err) {

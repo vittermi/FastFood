@@ -17,9 +17,4 @@ const preferenceSchema = new mongoose.Schema({
     }
 });
 
-function isPaymentTypeSet() {
-    return (this.paymentType === 'card' && this.cardDetails.token) || (this.paymentType === 'cash');
-}
-
 module.exports = mongoose.model('Preference', preferenceSchema);
-module.exports.isPaymentTypeSet = isPaymentTypeSet;
