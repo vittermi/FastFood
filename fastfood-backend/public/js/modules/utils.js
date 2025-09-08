@@ -33,6 +33,7 @@ export function showAlert(node, msg) {
     if (!node) return;
     node.textContent = msg;
     node.classList.remove('d-none');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 export function hideAlert(node) {

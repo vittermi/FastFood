@@ -5,10 +5,10 @@ const preferenceSchema = new mongoose.Schema({
     allergens: [String],
     paymentType: { type: String, enum: ['cash', 'card'], default: 'cash' },
     cardDetails: {
+        token: String,
         cardHolder: String,
         cardNumber: String,
         expiryDate: String,
-        cvv: Number
     },
     consents: {
         tos: { type: Boolean, required: true },
@@ -17,4 +17,9 @@ const preferenceSchema = new mongoose.Schema({
     }
 });
 
+function isPaymentTypeSet() {
+    return (this.paymentType === 'card' && this.cardDetails.token) || (this.paymentType === 'cash');
+}
+
 module.exports = mongoose.model('Preference', preferenceSchema);
+module.exports.isPaymentTypeSet = isPaymentTypeSet;

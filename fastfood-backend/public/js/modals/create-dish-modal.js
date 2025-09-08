@@ -68,9 +68,17 @@ export async function open({ prefill = null } = {}) {
 
                 add.addEventListener('click', onAddClick);
 
+                input.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        onAddClick();
+                    }
+                });
+
                 chipCleanUpLambdas.push(() => {
                     add.removeEventListener('click', onAddClick);
                     box.querySelectorAll('.chip').forEach(chip => chip.remove());
+                    input.removeEventListener('keypress', onAddClick);
                 });
             });
 

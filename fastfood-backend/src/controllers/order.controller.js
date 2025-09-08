@@ -12,7 +12,12 @@ exports.createOrder = async (req, res) => {
         const restaurantId = req.body.restaurantId;
 
         const user = await User.findById(customerId);
+        const preference = await Preference.findOne({ customer: customerId });
+
+        if (!preference || !preference.isPaymentTypeSet()) 
+            return res.status(400).json({ message: 'Payment method not set' });
         
+
         if (user?.userType !== UserTypes.CUSTOMER) return res.status(403).json({ message: 'Forbidden' });
         
         let totalAmount = 0;

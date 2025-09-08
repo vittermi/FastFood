@@ -15,8 +15,8 @@
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow fixed-top">
         <div class="container-fluid">
             <a class="navbar-brand fw-bold text-primary" href="/login">FastFood</a>
-            <button id="openUserMenuBtn" class="btn btn-outline-secondary ms-auto" aria-label="Open user menu"
-                data-bs-toggle="modal" data-bs-target="#userMenuModal">Menu</button>
+
+            <button class="btn btn-outline-secondary ms-auto" id="menuButton">Menu</button>
         </div>
     </nav>
 
@@ -39,7 +39,7 @@
                                         value="card" required />
                                     <label class="form-check-label" for="paymentTypeCard">Card</label>
                                 </div>
-                                <div class="invalid-feedback d-block">Please select a payment type.</div>
+                                <div class="invalid-feedback">Please select a payment type.</div>
                             </fieldset>
 
                             <div id="cardFields" class="row g-3 d-none" aria-hidden="true">

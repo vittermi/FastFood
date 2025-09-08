@@ -53,7 +53,7 @@ function setupButtonListeners(modalEl) {
 
     modalEl.querySelector('#btnPreferences').addEventListener('click', () => {
         modalInstance.hide();
-        window.location.assign('/user/preferences');
+        window.location.assign('/customer/preferences');
     });
 
     modalEl.querySelector('#btnUserOrders').addEventListener('click', () => {

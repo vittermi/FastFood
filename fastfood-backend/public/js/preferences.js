@@ -1,5 +1,7 @@
 import { showAlert, hideAlert } from "/js/modules/utils.js";
 import { authFetch } from "/js/modules/auth.js";
+import { showUserMenuModal } from './modals/user-menu-modal.js';
+
 
 document.addEventListener('DOMContentLoaded', async () => {
 
@@ -16,6 +18,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     paymentTypeCash.addEventListener('change', toggleCardFields);
     paymentTypeCard.addEventListener('change', toggleCardFields);
 
+    let paymentTokenPresent = false;
+
 
     btnAddAllergen.addEventListener('click', onAddClick);
     allergenInput.addEventListener('keypress', (e) => {
@@ -23,6 +27,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             e.preventDefault();
             onAddClick();
         }
+    });
+
+    const menuButton = document.getElementById('menuButton');
+    menuButton.addEventListener('click', () => {
+        showUserMenuModal();
     });
 
     prefsForm.addEventListener('submit', handleFormSubmit);
@@ -92,11 +101,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         try {
-            await updatePreferences(formData);
+            if (!paymentTokenPresent) await savePreferences(formData);
+            else await updatePreferences(formData);
+            hideAlert(prefsAlert);
             alert('Preferences saved successfully!');
         } catch (error) {
             console.error('Error saving preferences:', error);
-            alert('Failed to save preferences. Please try again later.');
+            showAlert(prefsAlert, 'Failed to save preferences. Please try again later.');
         }
     }
 
@@ -127,7 +138,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const cardExpiry = document.getElementById('cardExpiry').value.trim();
             const cardCvv = document.getElementById('cardCvv').value.trim();
 
-            if (!cardHolder || !cardNumber || !cardExpiry || !cardCvv) {
+            if ((!cardHolder || !cardNumber || !cardExpiry || !cardCvv) && !paymentTokenPresent) {
                 isValid = false;
                 showAlert(prefsAlert, 'Please fill in all card details.');
             }
@@ -141,11 +152,53 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
 
+    async function initializePreferencesIfPresent() {
+        try {
+            const preferences = await getPreferences();
+            if (!preferences) return;
+
+            if (preferences.paymentType === 'cash') {
+                document.getElementById('paymentTypeCash').checked = true;
+                paymentTokenPresent = true;
+            } else if (preferences.paymentType === 'card') {
+                document.getElementById('paymentTypeCard').checked = true;
+
+                if (preferences.cardDetails) {
+                    document.getElementById('cardHolder').value = preferences.cardDetails.cardHolder || '';
+                    document.getElementById('cardNumber').value = preferences.cardDetails.cardNumber || '';
+                    document.getElementById('cardExpiry').value = preferences.cardDetails.expiryDate || '';
+                    paymentTokenPresent = true;
+                }
+            }
+
+            toggleCardFields();
+
+            if (preferences.allergens && preferences.allergens.length > 0) {
+                const allergensChips = document.getElementById('allergensChips');
+                allergensChips.innerHTML = '';
+                preferences.allergens.forEach(allergen => {
+                    addChip(allergensChips, allergen);
+                });
+            }
+
+            if (preferences.consents) {
+                document.getElementById('consentTos').checked = preferences.consents.tos || false;
+                document.getElementById('consentPrivacy').checked = preferences.consents.privacy || false;
+                document.getElementById('consentOffers').checked = preferences.consents.offers || false;
+            }
+
+            console.log('Preferences loaded successfully');
+        } catch (error) {
+            console.error('Error initializing preferences:', error);
+            const prefsAlert = document.getElementById('prefsAlert');
+            showAlert(prefsAlert, 'Failed to load your preferences. Please try again later.', 'warning');
+        }
+    }
+
+
     toggleCardFields();
 
-    const existingPrefs = await getPreferences();
-
-    if (existingPrefs) initializePreferences();
+    initializePreferencesIfPresent();
 });
 
 
@@ -159,59 +212,29 @@ async function getPreferences() {
 }
 
 
+async function savePreferences(data) {
+    const response = await authFetch('/api/preferences', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    });
+    if (!response.ok) {
+        throw new Error(`Failed to update preferences: ${response.statusText}`);
+    }
+    return await response.json();
+}
+
+
 async function updatePreferences(data) {
-    debugger;
     const response = await authFetch('/api/preferences', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
     });
     if (!response.ok) {
-        console.error('Failed to update preferences:', response.statusText);
-        return null;
+        throw new Error(`Failed to update preferences: ${response.statusText}`);
     }
     return await response.json();
 }
 
 
-async function initializePreferences() {
-    try {
-        const preferences = await getPreferences();
-        if (!preferences) return;
-
-        if (preferences.paymentType === 'cash') {
-            document.getElementById('paymentTypeCash').checked = true;
-        } else if (preferences.paymentType === 'card') {
-            document.getElementById('paymentTypeCard').checked = true;
-
-            if (preferences.cardDetails) {
-                document.getElementById('cardHolder').value = preferences.cardDetails.cardHolder || '';
-                document.getElementById('cardNumber').value = preferences.cardDetails.cardNumber || '';
-                document.getElementById('cardExpiry').value = preferences.cardDetails.expiryDate || '';
-                document.getElementById('cardCvv').value = preferences.cardDetails.cvv || '';
-            }
-        }
-
-        toggleCardFields();
-
-        if (preferences.allergens && preferences.allergens.length > 0) {
-            const allergensChips = document.getElementById('allergensChips');
-            allergensChips.innerHTML = ''; // Clear existing chips
-            preferences.allergens.forEach(allergen => {
-                addChip(allergensChips, allergen);
-            });
-        }
-
-        if (preferences.consents) {
-            document.getElementById('consentTos').checked = preferences.consents.tos || false;
-            document.getElementById('consentPrivacy').checked = preferences.consents.privacy || false;
-            document.getElementById('consentOffers').checked = preferences.consents.offers || false;
-        }
-
-        console.log('Preferences loaded successfully');
-    } catch (error) {
-        console.error('Error initializing preferences:', error);
-        const prefsAlert = document.getElementById('prefsAlert');
-        showAlert(prefsAlert, 'Failed to load your preferences. Please try again later.', 'warning');
-    }
-}

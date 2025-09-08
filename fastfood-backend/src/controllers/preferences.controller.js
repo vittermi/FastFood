@@ -1,12 +1,41 @@
 const Preference = require('../models/Preference');
+const bcrypt = require('bcryptjs');
+
+
+// funge da mock per il gateway di pagamento, fa anche validazione ecc
+async function validateCardAndProcessMock(cardDetails) {
+
+    if (!cardDetails ||
+        !cardDetails.cardHolder ||
+        !cardDetails.cardNumber ||
+        !cardDetails.expiryDate ||
+        !cardDetails.cvv) {
+        throw new Error('All card details (cardHolder, cardNumber, expiryDate, cvv) are required');
+    }
+
+    const payload = {
+        cardHolder: cardDetails.cardHolder,
+        cardNumber: cardDetails.cardNumber,
+        expiryDate: cardDetails.expiryDate,
+        cvv: cardDetails.cvv,
+    };
+
+    const encoded = await bcrypt.hash(JSON.stringify(payload), 12); // in un'app vera prendi token da payment gateway e.g. Stripe
+    return {
+        token: encoded,
+        cardHolder: cardDetails.cardHolder,
+        cardNumber: `**** **** **** ${(cardDetails.cardNumber || '').slice(-4)}`,
+        expiryDate: cardDetails.expiryDate,
+    };
+}
 
 
 exports.getPreferences = async (req, res) => {
     try {
-        const preferences = await Preference.findOne({ customer: req.user.id });
+        const preferences = await Preference.findOne({ customer: req.user.id }).lean();
 
         if (!preferences) return res.status(404).json({ message: 'No preferences found for this user' });
-        
+
         res.json(preferences);
     } catch (err) {
         console.error(`Error fetching preferences: ${err.message}`);
@@ -21,13 +50,13 @@ exports.savePreferences = async (req, res) => {
 
         if (!consents.tos || !consents.privacy) {
             return res.status(400).json({
-                message: 'Required consents missing',
+                message: 'Required consents missing'
             });
         }
 
         if (paymentType === 'card') {
-            if (!cardDetails || !cardDetails.cardHolder || !cardDetails.cardNumber ||
-                !cardDetails.expiryDate || !cardDetails.cvv) {
+            if ((!cardDetails || !cardDetails.cardHolder || !cardDetails.cardNumber ||
+                !cardDetails.expiryDate || !cardDetails.cvv)) {
                 return res.status(400).json({
                     message: 'Card details are required for card payment type'
                 });
@@ -42,7 +71,7 @@ exports.savePreferences = async (req, res) => {
             preferences.consents = consents;
 
             if (paymentType === 'card') {
-                preferences.cardDetails = cardDetails;
+                preferences.cardDetails = await validateCardAndProcessMock(cardDetails);
             } else {
                 preferences.cardDetails = undefined;
             }
@@ -58,7 +87,7 @@ exports.savePreferences = async (req, res) => {
             };
 
             if (paymentType === 'card') {
-                preferencesData.cardDetails = cardDetails;
+                preferencesData.cardDetails = validateCardAndProcessMock(cardDetails);
             }
 
             preferences = new Preference(preferencesData);
@@ -101,19 +130,25 @@ exports.updatePreferences = async (req, res) => {
         }
 
         if (updates.cardDetails && (preferences.paymentType === 'card' || updates.paymentType === 'card')) {
-            preferences.cardDetails = {
-                ...preferences.cardDetails,
-                ...updates.cardDetails
-            };
+            const currentCardDetails = preferences.cardDetails || {};
+            const areDetailsEqual =
+                currentCardDetails.cardHolder === updates.cardDetails.cardHolder &&
+                currentCardDetails.cardNumber === updates.cardDetails.cardNumber &&
+                currentCardDetails.expiryDate === updates.cardDetails.expiryDate
+
+            if (!areDetailsEqual) {
+                if (updates.paymentType === 'card' || (preferences.paymentType === 'card' && !updates.paymentType))
+                    preferences.cardDetails = await validateCardAndProcessMock(updates.cardDetails);
+                else preferences.cardDetails = undefined;
+
+            }
         }
 
         if (updates.allergens) preferences.allergens = updates.allergens;
+
         if (updates.paymentType) {
             preferences.paymentType = updates.paymentType;
-            // If changing to cash, remove card details
-            if (updates.paymentType === 'cash') {
-                preferences.cardDetails = undefined;
-            }
+            if (updates.paymentType === 'cash') preferences.cardDetails = undefined;
         }
 
         await preferences.save();
