@@ -114,6 +114,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     function validateForm() {
         let isValid = true;
 
+
         if (!paymentTypeCash.checked && !paymentTypeCard.checked) {
             document.querySelector('.invalid-feedback').classList.add('d-block');
             isValid = false;
@@ -154,6 +155,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     async function initializePreferencesIfPresent() {
         try {
+            debugger;
             const preferences = await getPreferences();
             if (!preferences) return;
 

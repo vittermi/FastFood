@@ -21,30 +21,30 @@ app.use(cookieParser());
 
 // configurazione header CSP helmet per evitare attacchi XSS e permettere bootstrap ecc
 app.use(
-  helmet.contentSecurityPolicy({
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: [
-        "'self'",
-        "https://cdn.jsdelivr.net", // bootstrap
-      ],
-      styleSrc: [
-        "'self'",
-        "https://cdn.jsdelivr.net", // bootstrap
-        "https://fonts.googleapis.com", // google fonts
-      ],
-      fontSrc: [
-        "'self'",
-        "https://fonts.googleapis.com", // google fonts
-        "https://fonts.gstatic.com", // google fonts
-        "https://cdn.jsdelivr.net", // bootstrap
-      ],
-      imgSrc: ["*", "data:"], // para las imajes de meals.json y bootstrap
-      connectSrc: ["'self'"],
-      objectSrc: ["'none'"],
-      upgradeInsecureRequests: [],
-    },
-  })
+    helmet.contentSecurityPolicy({
+        directives: {
+            defaultSrc: ["'self'"],
+            scriptSrc: [
+                "'self'",
+                "https://cdn.jsdelivr.net", // bootstrap
+            ],
+            styleSrc: [
+                "'self'",
+                "https://cdn.jsdelivr.net", // bootstrap
+                "https://fonts.googleapis.com", // google fonts
+            ],
+            fontSrc: [
+                "'self'",
+                "https://fonts.googleapis.com", // google fonts
+                "https://fonts.gstatic.com", // google fonts
+                "https://cdn.jsdelivr.net", // bootstrap
+            ],
+            imgSrc: ["*", "data:"], // para las imajes de meals.json y bootstrap
+            connectSrc: ["'self'"],
+            objectSrc: ["'none'"],
+            upgradeInsecureRequests: [],
+        },
+    })
 );
 
 
@@ -67,6 +67,7 @@ app.get('/owner/restaurant', (_req, res) => res.sendFile(path.join(pagePath, 'ma
 
 app.get('/register', (_req, res) => res.sendFile(path.join(pagePath, 'register.html')));
 app.get('/user/edit', (_req, res) => res.sendFile(path.join(pagePath, 'edit-user.html')));
+app.get('/customer/preferences', (_req, res) => res.sendFile(path.join(pagePath, 'customer-preferences.html')));
 app.get('/customer/orders', (_req, res) => res.sendFile(path.join(pagePath, 'customer-orders.html')));
 
 // api backend 
@@ -80,6 +81,14 @@ app.use('/api/orders', require('./src/routes/order.routes'));
 app.use('/api/restaurants', require('./src/routes/restaurant.routes'));
 app.use('/api/dishes', require('./src/routes/dish.routes'));
 app.use('/api/statistics', require('./src/routes/statistics.routes'));
+app.use('/api/preferences', require('./src/routes/preferences.routes'));
+
+// errori
+
+app.use((_req, res) => {
+    res.status(404).sendFile(path.join(pagePath, 'errors', '404.html'));
+});
+
 
 
 const PORT = process.env.PORT || 5000;

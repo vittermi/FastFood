@@ -1,4 +1,4 @@
-const { OrderStatus } = require('../utils/enums');
+const { OrderStatus } = require('./enums');
 
 // todo aggiungi a relazione
 
