@@ -9,6 +9,7 @@ class RestaurantMenu {
             menu: id => `/api/restaurants/${id}/dishes`,
             cart: '/api/cart',
             restaurant: id => `/api/restaurants/${id}`,
+            preferences: '/api/preferences'
         };
         this.LS_KEY = 'restaurant_cart';
 
@@ -32,7 +33,7 @@ class RestaurantMenu {
         this.dishes = [];
         this.filtered = [];
         this.cart = this.loadCart();
-
+        this.preferences = null;
         this.cartModal = null;
 
         this.init = this.init.bind(this);
@@ -43,6 +44,7 @@ class RestaurantMenu {
         this.addToCart = this.addToCart.bind(this);
         this.changeQty = this.changeQty.bind(this);
         this.checkout = this.checkout.bind(this);
+        this.fetchPreferences = this.fetchPreferences.bind(this);
     }
 
     getRestaurantIdFromUrl() {
@@ -57,6 +59,8 @@ class RestaurantMenu {
             this.elements.menuPageTitle.textContent = `${restaurant.name} – Menu`;
 
             await this.fetchMenu();
+            await this.fetchPreferences();
+
             this.renderMenu();
             this.renderCart();
 
@@ -113,6 +117,17 @@ class RestaurantMenu {
         }
     }
 
+    async fetchPreferences() {
+        try {
+            const response = await authFetch(this.API.preferences);
+            if (!response.ok) throw new Error(`${response.status} – ${response.statusText}`);
+            this.preferences = await response.json();
+        } catch (err) {
+            console.error(err);
+            throw new Error('Failed to fetch preferences');
+        }
+    }
+
     async fetchMenu() {
         try {
             const response = await authFetch(this.API.menu(this.restaurantId));
@@ -151,9 +166,19 @@ class RestaurantMenu {
         });
     }
 
+
     createDishCard(dish) {
         const card = document.createElement('div');
-        card.className = 'card mb-3';
+        let className = 'card mb-3';
+
+        if (this.preferences) {
+            if (this.preferences.allergens && this.preferences.allergens.length > 0) {
+                const hasAllergen = dish.allergens.some(a => this.preferences.allergens.includes(a));
+                if (hasAllergen) className += ' border-danger';
+            }
+        }
+
+        card.className = className;
         card.innerHTML = `
           <div class="card-body">
             <div class="d-flex justify-content-between">
