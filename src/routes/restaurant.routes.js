@@ -50,9 +50,9 @@ router.post(
     restaurantController.createRestaurant
 );
 
-router.get('/', auth, restaurantController.getRestaurants);
+router.get('/', restaurantController.getRestaurants);
 
-router.get('/:id', auth, restaurantController.getRestaurantById);
+router.get('/:id', restaurantController.getRestaurantById);
 
 router.get('/:restaurantId/dishes', dishController.getDishesForRestaurant);
 

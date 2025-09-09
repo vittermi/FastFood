@@ -31,7 +31,7 @@ async function validateCardAndProcessMock(cardDetails) {
 
 
 exports.getPreferences = async (req, res) => {
-    try {
+    try {        
         const preferences = await Preference.findOne({ customer: req.user.id }).lean();
 
         if (!preferences) return res.status(404).json({ message: 'No preferences found for this user' });

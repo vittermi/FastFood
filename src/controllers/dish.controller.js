@@ -57,7 +57,6 @@ exports.getTemplateDishes = async (req, res) => {
         const skip = (page - 1) * limit;
 
         const filters = {};
-        if (req.query.type) filters.type = req.query.type;
         if (req.query.category) filters.category = req.query.category;
 
         const templates = await DishTemplate.find(filters)
@@ -137,8 +136,7 @@ exports.getDishesForRestaurant = async (req, res) => {
             return res.status(404).json({ message: 'Restaurant not found' });
 
         const filters = {};
-        if (req.query.type) filters.type = req.query.type;
-        if (req.query.isAvailable) filters.isAvailable = req.query.isAvailable === 'true';
+        if (req.query.category) filters.category = req.query.category;
         if (req.query.name) filters.name = new RegExp(req.query.name, 'i');
 
         if (req.query.minPrice) filters.price = { ...filters.price, $gte: parseFloat(req.query.minPrice) };
@@ -220,20 +218,15 @@ exports.updateDish = async (req, res) => {
 
     try {
         const {
-            name, type, ingredients, category,
+            name, ingredients, category,
             allergens, price, tags, photo
         } = req.body;
 
         const dish = await Dish.findById(dishId);
         if (!dish) return res.status(404).json({ message: `Dish with id ${dishId} not found` });
-
-
-        // non vogliamo che aggiorni dishtemplate 
-        // todo add to relazione?
-
+        
         const updatedDish = await Dish.findByIdAndUpdate(dishId, {
             name,
-            type,
             ingredients,
             category,
             allergens,
@@ -264,7 +257,7 @@ exports.deleteDish = async (req, res) => {
 
         await Dish.findByIdAndDelete(dishId);
         console.log(`Dish deleted: ${dishId}`);
-        res.status(204).send();
+        res.status(200).send();
     } catch (err) {
         console.error('Error deleting dish:', err.message);
         res.status(500).json({ message: 'Internal server error' });

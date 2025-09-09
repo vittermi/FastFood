@@ -324,7 +324,7 @@ class OrdersManager {
         const statusMap = {
             'Ordered': 'bg-warning',
             'In Preparation': 'bg-info',
-            'In delivery': 'bg-secondary',
+            'In Delivery': 'bg-secondary',
             'Delivered': 'bg-success',
             'Cancelled': 'bg-danger'
         };

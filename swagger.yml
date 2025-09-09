@@ -48,8 +48,6 @@ components:
     UserUpdate:
       type: object
       properties:
-        username:
-          type: string
         email:
           type: string
           format: email
@@ -123,19 +121,17 @@ components:
     Dish:
       type: object
       properties:
-        id:
+        _id:
           type: string
         restaurant:
           type: string
+        baseDish:
+          type: string
         name:
           type: string
-        type:
+        category:
           type: string
         ingredients:
-          type: array
-          items:
-            type: string
-        measures:
           type: array
           items:
             type: string
@@ -145,36 +141,40 @@ components:
             type: string
         price:
           type: number
+        tags:
+          type: array
+          items:
+            type: string
         photo:
           type: string
     DishCreate:
       type: object
       required:
         - restaurant
-        - name
-        - type
         - price
       properties:
         restaurant:
           type: string
-        name:
+        baseDish:
           type: string
-        type:
+        name:
           type: string
         ingredients:
           type: array
           items:
             type: string
-        measures:
-          type: array
-          items:
-            type: string
+        category:
+          type: string
         allergens:
           type: array
           items:
             type: string
         price:
           type: number
+        tags:
+          type: array
+          items:
+            type: string
         photo:
           type: string
     DishUpdate:
@@ -182,28 +182,30 @@ components:
       properties:
         name:
           type: string
-        type:
-          type: string
         ingredients:
           type: array
           items:
             type: string
-        measures:
-          type: array
-          items:
-            type: string
+        category:
+          type: string
         allergens:
           type: array
           items:
             type: string
         price:
           type: number
+        tags:
+          type: array
+          items:
+            type: string
         photo:
           type: string
     Order:
       type: object
       properties:
-        id:
+        _id:
+          type: string
+        restaurant:
           type: string
         customer:
           type: string
@@ -217,13 +219,77 @@ components:
           type: string
           enum:
             [
-              pending,
-              accepted,
-              preparing,
-              ready,
-              completed,
-              rejected,
-              cancelled,
+              Ordered,
+              In Preparation,
+              In Delivery,
+              Delivered,
+              Cancelled,
+            ]
+        createdAt:
+          type: string
+          format: date-time
+    OrderGetRest:
+      type: object
+      properties:
+        _id:
+          type: string
+        restaurant:
+          type: string
+        customer:
+          type: object
+          properties:
+            _id:
+              type: string
+            username:
+              type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/OrderItemPopulated"
+        totalAmount:
+          type: number
+        status:
+          type: string
+          enum:
+            [
+              Ordered,
+              In Preparation,
+              In Delivery,
+              Delivered,
+              Cancelled,
+            ]
+        createdAt:
+          type: string
+          format: date-time
+    OrderGetCustomer:
+      type: object
+      properties:
+        _id:
+          type: string
+        restaurant:
+          type: object
+          properties:
+            _id:
+              type: string
+            name:
+              type: string
+        customer:
+          type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/OrderItemPopulated"
+        totalAmount:
+          type: number
+        status:
+          type: string
+          enum:
+            [
+              Ordered,
+              In Preparation,
+              In Delivery,
+              Delivered,
+              Cancelled,
             ]
         createdAt:
           type: string
@@ -237,11 +303,29 @@ components:
           type: integer
         priceAtOrder:
           type: number
+    OrderItemPopulated:
+      type: object
+      properties:
+        dish:
+          type: object
+          properties:
+            _id:
+              type: string
+            name:
+              type: string
+            price:
+              type: number
+        quantity:
+          type: integer
+        priceAtOrder:
+          type: number
     OrderCreate:
       type: object
       required:
         - items
       properties:
+        restaurantId:
+          type: string
         items:
           type: array
           items:
@@ -289,14 +373,17 @@ components:
           default: cash
           description: Preferred payment method
         cardDetails:
-          $ref: "#/components/schemas/CardDetails"
+          $ref: "#/components/schemas/CardDetailsEncrypted"
         consents:
           $ref: "#/components/schemas/Consents"
           required: true
           description: User consents
-    CardDetails:
+    CardDetailsEncrypted:
       type: object
       properties:
+        token:
+          type: string
+          description: Card token (from mock payment gateway)      
         cardHolder:
           type: string
           description: Name of the card holder
@@ -306,9 +393,21 @@ components:
         expiryDate:
           type: string
           description: Card expiration date (MM/YY)
+    CardDetails:
+      type: object
+      properties:
+        cardHolder:
+          type: string
+          description: Name of the card holder
+        cardNumber:
+          type: string
+          description: Card number 
+        expiryDate:
+          type: string
+          description: Card expiration date (MM/YY)
         cvv:
           type: number
-          description: Card security code (encrypted in storage)
+          description: Card security code
     Consents:
       type: object
       required:
@@ -349,9 +448,6 @@ components:
         message:
           type: string
           description: Error message
-        details:
-          type: object
-          description: Additional error details (validation errors, etc.)
 
 security:
   - bearerAuth: []
@@ -391,8 +487,21 @@ paths:
       responses:
         "200":
           description: Logged out
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
         "401":
-          description: Unauthorized
+          description: Unauthorized - missing access token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Invalid or expired token
           content:
             application/json:
               schema:
@@ -411,17 +520,17 @@ paths:
               schema:
                 $ref: "#/components/schemas/TokenResponse"
         "401":
-          description: No refresh token provided
+          description: Unauthorized - missing access token
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
         "403":
-        description: Invalid refresh token
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/ErrorResponse"
+          description: Invalid refresh token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 
   /users:
     post:
@@ -463,6 +572,18 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/User"
+        "401":
+          description: Unauthorized - missing access token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Invalid or expired token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
         "404":
           description: User not found
           content:
@@ -471,7 +592,7 @@ paths:
                 $ref: "#/components/schemas/ErrorResponse"
 
   /users/{id}:
-    put:
+    patch:
       tags:
         - Users
       summary: Update user info
@@ -497,7 +618,13 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
         "401":
-          description: Unauthorized or incorrect password
+          description: Unauthorized - missing access token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Invalid or expired token
           content:
             application/json:
               schema:
@@ -517,7 +644,7 @@ paths:
     delete:
       tags:
         - Users
-      summary: Delete user
+      summary: Delete user and associated data (preferences)
       parameters:
         - in: path
           name: id
@@ -528,7 +655,13 @@ paths:
         "200":
           description: User deleted
         "401":
-          description: Unauthorized
+          description: Unauthorized - missing access token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Invalid or expired token
           content:
             application/json:
               schema:
@@ -546,8 +679,6 @@ paths:
         - Preferences
       summary: Get user preferences
       description: Retrieves the preferences for the authenticated user
-      security:
-        - bearerAuth: []
       responses:
         "200":
           description: User preferences retrieved successfully
@@ -556,7 +687,13 @@ paths:
               schema:
                 $ref: "#/components/schemas/Preference"
         "401":
-          description: Unauthorized - Invalid or missing token
+          description: Unauthorized - missing access token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Invalid or expired token
           content:
             application/json:
               schema:
@@ -631,7 +768,13 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
         "401":
-          description: Unauthorized - Invalid or missing token
+          description: Unauthorized - missing access token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Invalid or expired token
           content:
             application/json:
               schema:
@@ -693,7 +836,13 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
         "401":
-          description: Unauthorized - Invalid or missing token
+          description: Unauthorized - missing access token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Invalid or expired token
           content:
             application/json:
               schema:
@@ -728,7 +877,13 @@ paths:
                   message:
                     type: string
         "401":
-          description: Unauthorized - Invalid or missing token
+          description: Unauthorized - missing access token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Invalid or expired token
           content:
             application/json:
               schema:
@@ -760,14 +915,24 @@ paths:
       responses:
         "201":
           description: Restaurant created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Restaurant"
         "400":
           description: Invalid input
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized - missing access token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
         "403":
-          description: Forbidden - Not restaurant owner
+          description: Forbidden - Invalid or expired token or not restaurant owner
           content:
             application/json:
               schema:
@@ -777,6 +942,28 @@ paths:
         - Restaurants
       summary: Get all restaurants
       security: []
+      parameters:
+        - in: query
+          name: owner
+          schema:
+            type: string
+          description: Filter restaurants by owner ID
+        - in: query
+          name: name
+          schema:
+            type: string
+          description: Filter restaurants by name (case-insensitive, partial match)
+        - in: query
+          name: address
+          schema:
+            type: string
+          description: Filter restaurants by address (case-insensitive, partial match)
+        - in: query
+          name: openAt
+          schema:
+            type: string
+          example: "monday,18:30"
+          description: Filter restaurants open at a specific day and time
       responses:
         "200":
           description: List of restaurants
@@ -831,6 +1018,10 @@ paths:
       responses:
         "200":
           description: Restaurant updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Restaurant"
         "400":
           description: Invalid input
           content:
@@ -838,13 +1029,13 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
         "401":
-          description: Unauthorized
+          description: Unauthorized - missing access token
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
         "403":
-          description: Forbidden - Not restaurant owner
+          description: Forbidden - Invalid or expired token or not restaurant owner
           content:
             application/json:
               schema:
@@ -868,14 +1059,21 @@ paths:
       responses:
         "200":
           description: Restaurant deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
         "401":
-          description: Unauthorized
+          description: Unauthorized - missing access token
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
         "403":
-          description: Forbidden - Not restaurant owner
+          description: Forbidden - Invalid or expired token or not restaurant owner
           content:
             application/json:
               schema:
@@ -899,6 +1097,28 @@ paths:
           required: true
           schema:
             type: string
+        - in: query
+          name: category
+          schema:
+            type: string
+          description: Filter dishes by category 
+        - in: query
+          name: name
+          schema:
+            type: string
+          description: Case-insensitive partial match for dish name
+        - in: query
+          name: minPrice
+          schema:
+            type: number
+            format: float
+          description: Minimum price filter
+        - in: query
+          name: maxPrice
+          schema:
+            type: number
+            format: float
+          description: Maximum price filter
       responses:
         "200":
           description: List of dishes for a restaurant
@@ -929,6 +1149,10 @@ paths:
       responses:
         "201":
           description: Dish created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dish"
         "400":
           description: Invalid input
           content:
@@ -936,13 +1160,19 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
         "401":
-          description: Unauthorized
+          description: Unauthorized - missing access token
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
         "403":
-          description: Forbidden - Not restaurant owner
+          description: Forbidden - Invalid or expired token or not restaurant owner
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: BaseDish not found
           content:
             application/json:
               schema:
@@ -992,6 +1222,10 @@ paths:
       responses:
         "200":
           description: Dish updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dish"
         "400":
           description: Invalid input
           content:
@@ -999,13 +1233,13 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
         "401":
-          description: Unauthorized
+          description: Unauthorized - missing access token
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
         "403":
-          description: Forbidden - Not restaurant owner
+          description: Forbidden - Invalid or expired token or not restaurant owner
           content:
             application/json:
               schema:
@@ -1030,13 +1264,13 @@ paths:
         "200":
           description: Dish deleted
         "401":
-          description: Unauthorized
+          description: Unauthorized - missing access token
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
         "403":
-          description: Forbidden - Not restaurant owner
+          description: Forbidden - Invalid or expired token or not restaurant owner
           content:
             application/json:
               schema:
@@ -1069,15 +1303,10 @@ paths:
             default: 25
           description: Number of results per page
         - in: query
-          name: tag
+          name: category
           schema:
             type: string
-          description: Filter templates that include this tag
-        - in: query
-          name: type
-          schema:
-            type: string
-          description: Filter templates by dish type (e.g. Dessert, Main)
+          description: Filter templates by dish category (e.g. Dessert, Main)
       responses:
         200:
           description: A paginated list of template dishes
@@ -1138,11 +1367,25 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
         "401":
-          description: Unauthorized
+          description: Unauthorized - missing access token
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden - Invalid or expired token, not a customer, missing payment info, missing consents
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Restaurant or dish not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /orders/restaurant:
     get:
       tags:
         - Orders
@@ -1155,40 +1398,138 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Order"
+                  $ref: "#/components/schemas/OrderGetRest"
         "401":
-          description: Unauthorized
+          description: Unauthorized - missing access token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Invalid or expired token or not a restaurant owner
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Restaurant not found
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
-  /orders/{id}:
+  /orders/customer:
     get:
       tags:
         - Orders
-      summary: Get a specific order by ID
+      summary: Get all orders for the authenticated customer
+      responses:
+        "200":
+          description: List of orders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/OrderGetCustomer"
+        "401":
+          description: Unauthorized - missing access token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Invalid or expired token or not a customer
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Customer not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /orders/statuses:
+    get:
+      tags:
+        - Orders
+      summary: Get all possible order statuses
+      security: []
+      responses:
+        "200":
+          description: List of order statuses
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  enum:
+                    [
+                      Ordered,
+                      In Preparation,
+                      In Delivery,
+                      Delivered,
+                      Cancelled,
+                    ]
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /orders/{id}/transitions:
+    get:
+      tags:
+        - Orders
+      summary: Get possible status transitions for an order
       parameters:
         - in: path
           name: id
           required: true
           schema:
             type: string
+        - in: query
+          name: includeCancel
+          schema:
+            type: boolean
+          example: false
+          description: Include the CANCELLED transition (if available) when true
       responses:
         "200":
-          description: Order details
+          description: Available transitions for the order
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Order"
+                type: object
+                properties:
+                  orderId:
+                    type: string
+                  status:
+                    type: string
+                  transitions:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        [
+                          Ordered,
+                          In Preparation,
+                          In Delivery,
+                          Delivered,
+                          Cancelled,
+                        ]
         "401":
-          description: Unauthorized
+          description: Unauthorized - missing access token
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
         "403":
-          description: Forbidden - Not order owner or restaurant owner
+          description: Forbidden - invalid or expired token / not authorized
           content:
             application/json:
               schema:
@@ -1199,7 +1540,13 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+                
   /orders/{id}/status:
     put:
       tags:
@@ -1231,13 +1578,13 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
         "401":
-          description: Unauthorized
+          description: Unauthorized - missing access token
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
         "403":
-          description: Forbidden - Not authorized to update this order's status
+          description: Invalid or expired token or not authorized to update status
           content:
             application/json:
               schema:
@@ -1293,13 +1640,13 @@ paths:
                         revenue:
                           type: number
         "401":
-          description: Unauthorized
+          description: Unauthorized - missing access token
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
         "403":
-          description: Forbidden - Not restaurant owner
+          description: Forbidden - Invalid or expired token or not restaurant owner
           content:
             application/json:
               schema:

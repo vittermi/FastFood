@@ -6,7 +6,7 @@ const UserTypes = Object.freeze({
 const OrderStatus = Object.freeze({
     ORDERED: 'Ordered',
     PREPARATION: 'In Preparation',
-    DELIVERY: 'In delivery',
+    DELIVERY: 'In Delivery',
     DELIVERED: 'Delivered',
     CANCELLED: 'Cancelled',
 });

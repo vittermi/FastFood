@@ -30,7 +30,7 @@ exports.createRestaurant = async (req, res) => {
         console.error(`Error creating restaurant: ${err.message}`);
 
         if (err.name === 'ValidationError')
-            return res.status(400).json({ message: 'Invalid input', details: err.errors });
+            return res.status(400).json({ message: 'Invalid input' });
 
         res.status(500).json({ message: 'Internal server error' });
     }
@@ -88,7 +88,7 @@ exports.updateRestaurant = async (req, res) => {
         console.error(`Error updating restaurant: ${err.message}`);
 
         if (err.name === 'ValidationError')
-            return res.status(400).json({ message: 'Invalid input', details: err.errors });
+            return res.status(400).json({ message: 'Invalid input' });
 
         res.status(500).json({ message: 'Internal server error' });
     }

@@ -29,12 +29,14 @@ exports.createOrder = async (req, res) => {
         const preference = await Preference.findOne({ customer: customerId });
 
         if (!preference) 
-            return res.status(400).json({ message: 'Please set your preferences before placing an order.' });
+            return res.status(403).json({ message: 'Please set your preferences before placing an order.' });
         else if (!isPaymentTypeSet(preference))
-            return res.status(400).json({ message: 'Payment method not set.' });
+            return res.status(403).json({ message: 'Payment method not set.' });
         else if (!areRequiredConsentsGiven(preference)) 
-            return res.status(400).json({ message: 'Please set required consents in preferences.' });
+            return res.status(403).json({ message: 'Please set required consents in preferences.' });
 
+        if (!items || !Array.isArray(items) || items.length === 0)
+            return res.status(400).json({ message: 'Invalid order items.' });
 
         if (user?.userType !== UserTypes.CUSTOMER) return res.status(403).json({ message: 'Forbidden' });
 
@@ -74,7 +76,11 @@ exports.createOrder = async (req, res) => {
 
 exports.getOrdersByRestaurant = async (req, res) => {
     try {
+        const user = await User.findById(req.user.id);
         const restaurant = await Restaurant.findOne({ owner: req.user.id }).select('_id').lean().exec();
+
+        if (user?.userType !== UserTypes.RESTAURATEUR) return res.status(403).json({ message: 'Forbidden' });
+        if (!restaurant) return res.status(404).json({ message: 'No restaurant found' });
 
         const orders = await Order.find({ restaurant }).populate('items.dish', 'name price')
             .populate('customer', 'username');
@@ -88,6 +94,8 @@ exports.getOrdersByRestaurant = async (req, res) => {
 
 exports.getOrdersByCustomer = async (req, res) => {
     try {
+        const user = await User.findById(req.user.id);
+        if (user?.userType !== UserTypes.CUSTOMER) return res.status(403).json({ message: 'Forbidden' });
 
         const orders = await Order.find({ customer: req.user.id })
             .populate('items.dish', 'name price')
@@ -153,26 +161,9 @@ async function calculateEstimatedPreparationTimeMins(order) {
     return Math.round(additionalTime);
 }
 
-exports.getOrderById = async (req, res) => {
-    try {
-        const order = await Order.findById(req.params.id).populate('items.product', 'name price');
-        if (!order) {
-            return res.status(404).json({ message: 'Order not found' });
-        }
-        if (order.customer.toString() !== req.user.id) {
-            return res.status(403).json({ message: 'You can only view your own orders' });
-        }
-        res.json(order);
-    } catch (err) {
-        console.error(`Error fetching order: ${err.message}`);
-        res.status(500).json({ message: err.message });
-    }
-}
-
-// todo aggiungi a relazione
 exports.getOrderStatuses = (_req, res) => {
     try {
-        res.status(200).json(OrderStatus);
+        res.status(200).json(Object.values(OrderStatus));
     } catch (err) {
         console.error(`Error fetching order statuses: ${err.message}`);
         res.status(500).json({ message: 'Failed to fetch order statuses' });

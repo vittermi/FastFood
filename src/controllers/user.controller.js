@@ -65,7 +65,9 @@ exports.update = async (req, res) => {
 
 exports.remove = async (req, res) => {
     try {
-        await User.findByIdAndDelete(req.params.id);
+        const user = await User.findByIdAndDelete(req.params.id);
+        if (!user) return res.status(404).json({ message: 'User not found' });
+
         await Preference.deleteOne({ customer: req.user.id });
         res.clearCookie('refreshToken', {
             httpOnly: true,

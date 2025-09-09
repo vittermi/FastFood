@@ -147,7 +147,7 @@ class OrdersManager {
                 <span class="badge ${badgeClass}">${order.status}</span>
                 </div>
                 <div class="card-body">
-                <p class="card-text fw-bold mb-1">${order.customer?.username || 'Customer'}</p>
+                <p class="card-text fw-bold mb-1">${order.customer?.username || 'Unknown customer'}</p>
                 <p class="card-text text-muted small mb-3">${orderSummary}</p>
                 <div class="d-flex justify-content-between mb-2">
                     <span class="fw-bold">Total:</span>
@@ -334,7 +334,7 @@ class OrdersManager {
             'Ordered': 'bg-warning',
             'In Preparation': 'bg-info',
             'Ready': 'bg-primary',
-            'In delivery': 'bg-success',
+            'In Delivery': 'bg-success',
             'Delivered': 'bg-secondary',
             'Cancelled': 'bg-danger'
         };

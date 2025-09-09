@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const dishSchema = new mongoose.Schema({
-    restaurant: { type: mongoose.Schema.Types.ObjectId, ref: 'Restaurant' },
+    restaurant: { type: mongoose.Schema.Types.ObjectId, ref: 'Restaurant', required: true },
     baseDish: { type: mongoose.Schema.Types.ObjectId, ref: 'DishTemplate' },
     name: String,
     ingredients: [String],
