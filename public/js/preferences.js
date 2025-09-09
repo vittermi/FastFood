@@ -155,7 +155,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     async function initializePreferencesIfPresent() {
         try {
-            debugger;
             const preferences = await getPreferences();
             if (!preferences) return;
 
