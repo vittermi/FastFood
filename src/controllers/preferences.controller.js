@@ -169,19 +169,3 @@ exports.updatePreferences = async (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 };
-
-
-exports.deletePreferences = async (req, res) => {
-    try {
-        const result = await Preference.deleteOne({ customer: req.user.id });
-
-        if (result.deletedCount === 0) {
-            return res.status(404).json({ message: 'No preferences found for this user' });
-        }
-
-        res.json({ message: 'Preferences deleted successfully' });
-    } catch (err) {
-        console.error(`Error deleting preferences: ${err.message}`);
-        res.status(500).json({ message: 'Internal server error' });
-    }
-};

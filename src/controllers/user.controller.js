@@ -1,5 +1,6 @@
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
+const Preference = require('../models/Preference');
 
 exports.me = async (req, res) => {
     try {
@@ -65,6 +66,13 @@ exports.update = async (req, res) => {
 exports.remove = async (req, res) => {
     try {
         await User.findByIdAndDelete(req.params.id);
+        await Preference.deleteOne({ customer: req.user.id });
+        res.clearCookie('refreshToken', {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'Strict'
+        });
+
         res.json({ message: 'User deleted' });
     } catch (err) {
         console.error(`Error processing remove request: ${err}`);

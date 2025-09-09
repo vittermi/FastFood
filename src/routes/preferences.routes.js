@@ -9,6 +9,5 @@ const auth = require('../auth.middleware');
 router.post('/', auth, preferencesController.savePreferences);
 router.get('/', auth, preferencesController.getPreferences);
 router.put('/', auth, preferencesController.updatePreferences);
-router.delete('/', auth, preferencesController.deletePreferences);
 
 module.exports = router;
