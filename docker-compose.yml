@@ -11,18 +11,19 @@ services:
 
   backend:
     build:
-      context: ./fastfood-backend
+      context: ./
       dockerfile: Dockerfile
     container_name: fastfood-backend
     restart: no
     ports:
       - "5050:5050"
+      - "9229:9229" 
     env_file:
-      - ./fastfood-backend/.env
+      - ./.env
     depends_on:
       - mongo
     volumes:
-      - ./fastfood-backend:/app
+      - ./:/app
     working_dir: /app
 
 volumes:

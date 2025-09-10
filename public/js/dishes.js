@@ -149,8 +149,7 @@ async function createDish(dishData, selectedDishTemplate = {}) {
 
     ['ingredients', 'tags', 'allergens'].forEach(type => {
             const submittedItems = Array.isArray(dishData[type]) ? dishData[type] : [];
-            const itemsInTemplateDish = Array.isArray(selectedDishTemplate[type]) ? selectedDishTemplate[type] : [];
-            dishData[type] = submittedItems.filter(item => !itemsInTemplateDish.includes(item));
+            dishData[type] = submittedItems;
     });
 
     dishData.baseDish = selectedDishTemplate?._id || null;
