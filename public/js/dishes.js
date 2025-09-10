@@ -175,9 +175,8 @@ async function updateDish(dishData) {
 
     if (templateDish) {
         ['ingredients', 'tags', 'allergens'].forEach(type => {
-            const submittedItems = Array.isArray(dishData[type]) ? dishData[type] : [];
-            const itemsInTemplateDish = Array.isArray(templateDish[type]) ? templateDish[type] : [];
-            dishData[type] = submittedItems.filter(item => !itemsInTemplateDish.includes(item));
+                const submittedItems = Array.isArray(dishData[type]) ? dishData[type] : [];
+                dishData[type] = submittedItems;
         });
     }
 
