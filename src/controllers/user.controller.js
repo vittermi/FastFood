@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const Preference = require('../models/Preference');
+const Restaurant = require('../models/Restaurant');
 
 exports.me = async (req, res) => {
     try {
@@ -68,7 +69,10 @@ exports.remove = async (req, res) => {
         const user = await User.findByIdAndDelete(req.params.id);
         if (!user) return res.status(404).json({ message: 'User not found' });
 
+        // dovrebbe essere una transazione ma necessita di configurazione del server mongo
         await Preference.deleteOne({ customer: req.user.id });
+        await Restaurant.deleteOne({ owner: req.user.id });
+
         res.clearCookie('refreshToken', {
             httpOnly: true,
             secure: true,

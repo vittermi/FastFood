@@ -41,9 +41,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             btnEditUser.disabled = true;
             const result = await updateUserInfo(payload, userData.id);
 
-            // todo aggiungi logout?
-
-            window.location.href = '/login.html'; // login fa in automatico redirect se esiste token
+            window.location.href = '/login'; // login fa in automatico redirect se esiste token
             console.log('Updated user:', result);
         } catch (err) {
             showAlert(alertBox, err?.message || 'Update failed. Please try again.');

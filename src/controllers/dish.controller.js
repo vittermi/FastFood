@@ -169,7 +169,7 @@ exports.getDishesForRestaurant = async (req, res) => {
 
     } catch (err) {
         console.error(`Error fetching dishes for restaurant}: ${err.message}`);
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ message: 'Internal server error' });
     }
 };
 

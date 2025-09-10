@@ -18,9 +18,8 @@ export async function init() {
 
         try {
             const payload = collectRestaurantFromForm(root);
-            const saved = await createRestaurant(payload);
-
-            window.loadSection('restaurant-view', { restaurant: saved ?? payload });
+            await createRestaurant(payload);
+            window.location.href = "/owner/restaurant";
         } catch (err) {
             console.error(err);
             showAlert(alertBox, err?.message || 'Failed to save changes. Please try again.');

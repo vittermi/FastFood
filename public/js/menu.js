@@ -120,8 +120,9 @@ class RestaurantMenu {
     async fetchPreferences() {
         try {
             const response = await authFetch(this.API.preferences);
-            if (!response.ok) throw new Error(`${response.status} – ${response.statusText}`);
-            this.preferences = await response.json();
+            const status = response.status;
+            if (!response.ok && status !== 404) throw new Error(`${response.status} – ${response.statusText}`);
+            this.preferences = status === 404 ? await response.json() : null;
         } catch (err) {
             console.error(err);
             throw new Error('Failed to fetch preferences');

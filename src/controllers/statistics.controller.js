@@ -44,11 +44,7 @@ exports.getSummary = async (req, res) => {
         });
     } catch (error) {
         console.error('Error getting statistics summary:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Failed to retrieve statistics',
-            error: error.message
-        });
+        res.status(500).json({ message: 'Internal server error' });
     }
 };
 
@@ -72,11 +68,7 @@ exports.getOrdersPerDay = async (req, res) => {
         });
     } catch (error) {
         console.error('Error getting orders per day:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Failed to retrieve orders per day statistics',
-            error: error.message
-        });
+        res.status(500).json({ message: 'Internal server error' });
     }
 };
 
@@ -100,11 +92,7 @@ exports.getTotalDelivered = async (req, res) => {
         });
     } catch (error) {
         console.error('Error getting total delivered orders:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Failed to retrieve total delivered orders',
-            error: error.message
-        });
+        res.status(500).json({ message: 'Internal server error' });
     }
 };
 
@@ -129,11 +117,7 @@ exports.getAverageOrderPrice = async (req, res) => {
         });
     } catch (error) {
         console.error('Error getting average order price:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Failed to retrieve average order price',
-            error: error.message
-        });
+        res.status(500).json({ message: 'Internal server error' });
     }
 };
 
@@ -159,11 +143,7 @@ exports.getMostOrderedProducts = async (req, res) => {
         });
     } catch (error) {
         console.error('Error getting most ordered products:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Failed to retrieve most ordered products',
-            error: error.message
-        });
+        res.status(500).json({ message: 'Internal server error' });
     }
 };
 
@@ -189,11 +169,7 @@ exports.getLeastOrderedProducts = async (req, res) => {
         });
     } catch (error) {
         console.error('Error getting least ordered products:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Failed to retrieve least ordered products',
-            error: error.message
-        });
+        res.status(500).json({ message: 'Internal server error' });
     }
 };
 

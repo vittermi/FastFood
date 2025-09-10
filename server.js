@@ -54,12 +54,11 @@ const pagePath = path.join(__dirname, 'public', 'pages');
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.get('/', (_req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
+app.get('/', (_req, res) => res.sendFile(path.join(pagePath, 'login.html'))); //todo togli
 app.get('/login', (_req, res) => res.sendFile(path.join(pagePath, 'login.html')));
 app.get('/restaurants', (_req, res) => res.sendFile(path.join(pagePath, 'browse-restaurants.html')));
 
-app.get('/menu/:id', (req, res) => {
-    const restaurantId = req.params.id;
+app.get('/menu/:id', (_req, res) => {
     res.sendFile(path.join(pagePath, 'menu.html')); //todo wtf
 });
 

@@ -69,7 +69,7 @@ exports.createOrder = async (req, res) => {
         res.status(201).json(order);
     } catch (err) {
         console.error(`Error creating order: ${err.message}`);
-        res.status(500).json({ message: err.message });
+        res.status(500).json({ message: "Internal server error" });
     }
 };
 
@@ -87,7 +87,7 @@ exports.getOrdersByRestaurant = async (req, res) => {
         res.json(orders);
     } catch (err) {
         console.error(`Error fetching orders: ${err.message}`);
-        res.status(500).json({ message: err.message });
+        res.status(500).json({ message: 'Internal server error' });
     }
 }
 
@@ -115,7 +115,7 @@ exports.getOrdersByCustomer = async (req, res) => {
         res.json(processedOrders);
     } catch (err) {
         console.error(`Error fetching orders: ${err.message}`);
-        res.status(500).json({ message: err.message });
+        res.status(500).json({ message: "Internal server error" });
     }
 }
 
@@ -166,7 +166,7 @@ exports.getOrderStatuses = (_req, res) => {
         res.status(200).json(Object.values(OrderStatus));
     } catch (err) {
         console.error(`Error fetching order statuses: ${err.message}`);
-        res.status(500).json({ message: 'Failed to fetch order statuses' });
+        res.status(500).json({ message: 'Internal server error' });
     }
 };
 
@@ -185,7 +185,7 @@ exports.getAvailableTransitions = async (req, res) => {
         });
     } catch (err) {
         console.error(`Error fetching available transitions: ${err.message}`);
-        res.status(500).json({ message: 'Failed to fetch available transitions' });
+        res.status(500).json({ message: 'Internal server error' });
     }
 };
 
@@ -195,10 +195,9 @@ exports.updateStatus = async (req, res) => {
 
         const customerId = req.user.id;
         const user = await User.findById(customerId);
-
-        if (user?.userType !== UserTypes.RESTAURATEUR) return res.status(403).json({ message: 'Forbidden' });
-
         const { newStatus } = req.body;
+
+        if (user?.userType !== UserTypes.RESTAURATEUR && newStatus !== OrderStatus.CANCELLED) return res.status(403).json({ message: 'Forbidden' });
 
         if (!newStatus) return res.status(400).json({ message: 'New status is required' });
 
@@ -217,6 +216,6 @@ exports.updateStatus = async (req, res) => {
         res.status(200).json(order);
     } catch (err) {
         console.error('Error updating order status:', err.message);
-        res.status(500).json({ message: err.message });
+        res.status(500).json({ message: 'Internal server error' });
     }
 };
