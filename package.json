@@ -4,10 +4,9 @@
     "description": "FasFood application: the 2025-26 exam project for the 'Technologies and languages for the web' course at Università degli studi di Milano",
     "main": "index.js",
     "scripts": {
-        "test": "node --inspect=0.0.0.0:9229 server.js",
+        "debug": "node --inspect=0.0.0.0:9229 server.js",
         "import:dishes": "node scripts/importDishes.js",
         "start": "node server.js"
-        
     },
     "author": "Vittorio Ermini (mat. 923130)",
     "license": "MIT",

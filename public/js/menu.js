@@ -7,7 +7,6 @@ class RestaurantMenu {
     constructor() {
         this.API = {
             menu: id => `/api/restaurants/${id}/dishes`,
-            cart: '/api/cart',
             restaurant: id => `/api/restaurants/${id}`,
             preferences: '/api/preferences'
         };
@@ -122,7 +121,7 @@ class RestaurantMenu {
             const response = await authFetch(this.API.preferences);
             const status = response.status;
             if (!response.ok && status !== 404) throw new Error(`${response.status} – ${response.statusText}`);
-            this.preferences = status === 404 ? await response.json() : null;
+            this.preferences = status === 404 ? null : await response.json();
         } catch (err) {
             console.error(err);
             throw new Error('Failed to fetch preferences');
@@ -208,12 +207,6 @@ class RestaurantMenu {
         this.cart[dish._id].qty += 1;
         this.persistCart();
         this.renderCart();
-
-        authFetch(this.API.cart, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ dishId: dish._id, quantity: 1 })
-        }).catch(console.error);
     }
 
     async showDishDetails(dish) {
@@ -234,13 +227,6 @@ class RestaurantMenu {
 
         this.persistCart();
         this.renderCart();
-
-        // Update server cart
-        authFetch(`${this.API.cart}/${dishId}`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ delta })
-        }).catch(console.error);
     }
 
     renderCart() {

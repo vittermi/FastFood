@@ -16,7 +16,7 @@ npm install
 ```
 
 ### 3. Set up environment variables 
-example .env:
+example .env (docker compose):
 ```
 PORT=5050
 MONGO_URI=mongodb://mongo:27017/fastfood
@@ -26,23 +26,41 @@ JWT_EXPIRATION=15m
 JWT_REFRESH_EXPIRATION=1d
 ```
 
+example .env (Local):
+```
+PORT=5050
+MONGO_URI=mongodb://localhost:27017/fastfood
+JWT_SECRET=your_jwt_secret
+JWT_REFRESH_SECRET=your_refresh_secret
+JWT_EXPIRATION=15m
+JWT_REFRESH_EXPIRATION=1d
+```
 
-### 4a. Run the backend locally 
+Change the MONGO_URI variable accordingly if running a remote mongo server.
+
+### 4a. Run the backend locally (requires running mongodb instance)
 
 ```sh
 npm start
 ```
 
+**If your mongo instance is empty** import templateDishes with the following command.
+If your mongo was not running do not worry, the script checks for duplicates.
+
+```sh
+npm run import:dishes
+```
 
 ### 4b. Or run everything with Docker Compose
 
-It will run a mongodb instance (with a volume to persist data once the container is stopped), the backend and the frontend applications (see main readme)
+It will run a mongodb instance (with a volume to persist data once the container is stopped), the backend and the frontend applications
 
 ```sh
 docker compose up
 ```
 
-The APIs will be available at http://localhost:5050 by default, a Swagger describing the APIs will be available at the /api-docs endpoint once the application is started.
+The app will be available at http://localhost:5050 by default.
+A Swagger describing the APIs will be available at http://localhost:5050/api-docs once the application is started.
 
 To import the dish data, you have to run the following command
 
